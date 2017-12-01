@@ -30,7 +30,7 @@ public class ExtendedStringLib extends StringLib {
 	}
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaValue result = super.call(modname, env);
-		LuaTable table = instance;
+		LuaTable table = result.checktable();
 		table.set("endsWith", new EndsWith());
 		table.set("startsWith", new StartsWith());
 		table.set("replace", new Replace());

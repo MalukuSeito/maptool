@@ -64,6 +64,8 @@ public class VBLLib extends TwoArgFunction {
 				case CIRCLE:
 					drawCircleVBL(renderer, vblObject, erase);
 					break;
+				default:
+					break;
 				}
 			} catch (ParserException e) {
 				throw new LuaError(e);

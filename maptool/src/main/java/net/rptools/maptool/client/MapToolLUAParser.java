@@ -126,7 +126,7 @@ public class MapToolLUAParser {
 				line = line.substring(LUA_HEADER.length());
 			}
 			LuaValue chunk = globals.load(new ByteArrayInputStream(line.getBytes()),
-					(context != null ? context.getName() + "@" + context.getSouce() : "Chat") + (tokenInContext != null ? " (" + tokenInContext.getName() + ":" + tokenInContext.getId() + ")" : ""),
+					(context != null ? context.getName() + "@" + context.getSource() : "Chat") + (tokenInContext != null ? " (" + tokenInContext.getName() + ":" + tokenInContext.getId() + ")" : ""),
 					"t", user_globals);
 			LuaValue macroReturn = chunk.call();
 			if (macroReturn.isnoneornil(1) ) {

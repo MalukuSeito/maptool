@@ -55,7 +55,7 @@ public class Exec extends VarArgFunction {
 			seen.put(input, v);
 			return v;
 		} else if (input.isstring()) {
-			MapToolMacroContext context = new MapToolMacroContext("<dynamic>", MapTool.getParser().getContext().getSouce(), trusted);
+			MapToolMacroContext context = new MapToolMacroContext("<dynamic>", MapTool.getParser().getContext().getSource(), trusted);
 			MapToolVariableResolver res = resolver;
 			if (newContext) {
 				res = new MapToolVariableResolver(resolver.getTokenInContext());

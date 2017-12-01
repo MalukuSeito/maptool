@@ -58,6 +58,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -87,9 +88,12 @@ import net.rptools.maptool.client.AppStyle;
 import net.rptools.maptool.client.AppUtil;
 import net.rptools.maptool.client.MapTool;
 import net.rptools.maptool.client.ServerDisconnectHandler;
+import net.rptools.maptool.client.swing.AppHomeDiskSpaceStatusBar;
+import net.rptools.maptool.client.swing.AssetCacheStatusBar;
 import net.rptools.maptool.client.swing.CoordinateStatusBar;
 import net.rptools.maptool.client.swing.DragImageGlassPane;
 import net.rptools.maptool.client.swing.GlassPane;
+import net.rptools.maptool.client.swing.ImageCacheStatusBar;
 import net.rptools.maptool.client.swing.ImageChooserDialog;
 import net.rptools.maptool.client.swing.MemoryStatusBar;
 import net.rptools.maptool.client.swing.ProgressStatusBar;
@@ -101,6 +105,10 @@ import net.rptools.maptool.client.tool.StampTool;
 import net.rptools.maptool.client.ui.assetpanel.AssetDirectory;
 import net.rptools.maptool.client.ui.assetpanel.AssetPanel;
 import net.rptools.maptool.client.ui.commandpanel.CommandPanel;
+import net.rptools.maptool.client.ui.drawpanel.DrawPanelPopupMenu;
+import net.rptools.maptool.client.ui.drawpanel.DrawPanelTreeCellRenderer;
+import net.rptools.maptool.client.ui.drawpanel.DrawPanelTreeModel;
+import net.rptools.maptool.client.ui.drawpanel.DrawablesPanel;
 import net.rptools.maptool.client.ui.lookuptable.LookupTablePanel;
 import net.rptools.maptool.client.ui.macrobuttons.buttons.MacroButton;
 import net.rptools.maptool.client.ui.macrobuttons.panels.CampaignPanel;
@@ -121,9 +129,11 @@ import net.rptools.maptool.model.Token;
 import net.rptools.maptool.model.Zone;
 import net.rptools.maptool.model.ZoneFactory;
 import net.rptools.maptool.model.ZonePoint;
+import net.rptools.maptool.model.Zone.Layer;
 import net.rptools.maptool.model.drawing.DrawableColorPaint;
 import net.rptools.maptool.model.drawing.DrawablePaint;
 import net.rptools.maptool.model.drawing.DrawableTexturePaint;
+import net.rptools.maptool.model.drawing.DrawnElement;
 import net.rptools.maptool.model.drawing.Pen;
 import net.rptools.maptool.util.ImageManager;
 
@@ -180,6 +190,9 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 	private final ProgressStatusBar progressBar = new ProgressStatusBar();
 	private final ConnectionStatusPanel connectionStatusPanel = new ConnectionStatusPanel();
 	private CoordinateStatusBar coordinateStatusBar;
+	private AssetCacheStatusBar assetCacheStatusBar;
+	private ImageCacheStatusBar imageCacheStatusBar;
+	private AppHomeDiskSpaceStatusBar appHomeDiskSpaceStatusBar;
 	private ZoomStatusBar zoomStatusBar;
 	private JLabel chatActionLabel;
 
@@ -192,6 +205,8 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 
 	private final GlassPane glassPane;
 	private TokenPanelTreeModel tokenPanelTreeModel;
+	private DrawPanelTreeModel drawPanelTreeModel;
+	private DrawablesPanel drawablesPanel;
 	private final TextureChooserPanel textureChooserPanel;
 	private LookupTablePanel lookupTablePanel;
 
@@ -201,6 +216,9 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 	private JFileChooser saveCmpgnFileChooser;
 	private JFileChooser savePropsFileChooser;
 	private JFileChooser saveFileChooser;
+
+	// Remember the last layer selected
+	private Layer lastSelectedLayer = Zone.Layer.TOKEN;
 
 	private final FileFilter campaignFilter = new MTFileFilter("cmpgn", I18N.getText("file.ext.cmpgn"));
 	private final FileFilter mapFilter = new MTFileFilter("rpmap", I18N.getText("file.ext.rpmap"));
@@ -318,6 +336,10 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 		aboutDialog.setSize(354, 400);
 
 		statusPanel = new StatusPanel();
+
+		statusPanel.addPanel(getAssetCacheStatusBar());
+		statusPanel.addPanel(getImageCacheStatusBar());
+		statusPanel.addPanel(getAppHomeDiskSpaceStatusBar());
 		statusPanel.addPanel(getCoordinateStatusBar());
 		statusPanel.addPanel(getZoomStatusBar());
 		statusPanel.addPanel(MemoryStatusBar.getInstance());
@@ -365,7 +387,7 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 
 		glassPaneComposite.setVisible(true);
 
-		if (!MapTool.MAC_OS_X)
+		if (!AppUtil.MAC_OS_X)
 			removeWindowsF10();
 		else
 			registerForMacOSXEvents();
@@ -447,6 +469,7 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 		// @formatter:off
 		CONNECTIONS("Connections"),
 		TOKEN_TREE("MapExplorer"),
+		DRAW_TREE("DrawExplorer"),
 		INITIATIVE("Initiative"),
 		IMAGE_EXPLORER("Library"),
 		CHAT("Chat"),
@@ -490,6 +513,7 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 		getDockingManager().addFrame(getFrame(MTFrame.TOKEN_TREE));
 		getDockingManager().addFrame(getFrame(MTFrame.INITIATIVE));
 		getDockingManager().addFrame(getFrame(MTFrame.IMAGE_EXPLORER));
+		getDockingManager().addFrame(getFrame(MTFrame.DRAW_TREE));
 		getDockingManager().addFrame(getFrame(MTFrame.CHAT));
 		getDockingManager().addFrame(getFrame(MTFrame.LOOKUP_TABLES));
 		getDockingManager().addFrame(getFrame(MTFrame.GLOBAL));
@@ -517,6 +541,7 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 		frameMap.put(MTFrame.CONNECTIONS, createDockingFrame(MTFrame.CONNECTIONS, new JScrollPane(connectionPanel), new ImageIcon(AppStyle.connectionsImage)));
 		frameMap.put(MTFrame.TOKEN_TREE, createDockingFrame(MTFrame.TOKEN_TREE, new JScrollPane(createTokenTreePanel()), new ImageIcon(AppStyle.mapExplorerImage)));
 		frameMap.put(MTFrame.IMAGE_EXPLORER, createDockingFrame(MTFrame.IMAGE_EXPLORER, assetPanel, new ImageIcon(AppStyle.resourceLibraryImage)));
+		frameMap.put(MTFrame.DRAW_TREE, createDockingFrame(MTFrame.DRAW_TREE, new JScrollPane(createDrawTreePanel()), new ImageIcon(AppStyle.mapExplorerImage)));
 		frameMap.put(MTFrame.CHAT, createDockingFrame(MTFrame.CHAT, commandPanel, new ImageIcon(AppStyle.chatPanelImage)));
 		frameMap.put(MTFrame.LOOKUP_TABLES, createDockingFrame(MTFrame.LOOKUP_TABLES, getLookupTablePanel(), new ImageIcon(AppStyle.tablesPanelImage)));
 		frameMap.put(MTFrame.INITIATIVE, createDockingFrame(MTFrame.INITIATIVE, initiativePanel, new ImageIcon(AppStyle.initiativePanelImage)));
@@ -694,11 +719,40 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 		return zoomStatusBar;
 	}
 
+	public AssetCacheStatusBar getAssetCacheStatusBar() {
+		if (assetCacheStatusBar == null) {
+			assetCacheStatusBar = new AssetCacheStatusBar();
+		}
+		return assetCacheStatusBar;
+	}
+
+	public ImageCacheStatusBar getImageCacheStatusBar() {
+		if (imageCacheStatusBar == null) {
+			imageCacheStatusBar = new ImageCacheStatusBar();
+		}
+		return imageCacheStatusBar;
+	}
+
+	public AppHomeDiskSpaceStatusBar getAppHomeDiskSpaceStatusBar() {
+		if (appHomeDiskSpaceStatusBar == null) {
+			appHomeDiskSpaceStatusBar = new AppHomeDiskSpaceStatusBar();
+		}
+		return appHomeDiskSpaceStatusBar;
+	}
+
 	public CoordinateStatusBar getCoordinateStatusBar() {
 		if (coordinateStatusBar == null) {
 			coordinateStatusBar = new CoordinateStatusBar();
 		}
 		return coordinateStatusBar;
+	}
+
+	public Layer getLastSelectedLayer() {
+		return lastSelectedLayer;
+	}
+
+	public void setLastSelectedLayer(Layer lastSelectedLayer) {
+		this.lastSelectedLayer = lastSelectedLayer;
 	}
 
 	public void hideControlPanel() {
@@ -821,6 +875,104 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 		}
 	}
 
+	private JComponent createDrawTreePanel() {
+		final JTree tree = new JTree();
+		drawablesPanel = new DrawablesPanel();
+		drawPanelTreeModel = new DrawPanelTreeModel(tree);
+		tree.setModel(drawPanelTreeModel);
+		tree.setCellRenderer(new DrawPanelTreeCellRenderer());
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitPane.setContinuousLayout(true);
+
+		splitPane.setTopComponent(new JScrollPane(tree));
+		splitPane.setBottomComponent(drawablesPanel);
+		splitPane.setDividerLocation(100);
+		// Add mouse Event for right click menu
+		tree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+				if (path == null) {
+					return;
+				}
+				Object row = path.getLastPathComponent();
+				int rowIndex = tree.getRowForLocation(e.getX(), e.getY());
+				if (SwingUtilities.isLeftMouseButton(e)) {
+					if (!SwingUtil.isShiftDown(e) && !SwingUtil.isControlDown(e)) {
+						tree.clearSelection();
+					}
+					tree.addSelectionInterval(rowIndex, rowIndex);
+					if (row instanceof DrawnElement) {
+						if (e.getClickCount() == 2) {
+							DrawnElement de = (DrawnElement) row;
+							getCurrentZoneRenderer().centerOn(new ZonePoint((int) de.getDrawable().getBounds().getCenterX(), (int) de.getDrawable().getBounds().getCenterY()));
+						}
+					}
+
+					int[] treeRows = tree.getSelectionRows();
+					java.util.Arrays.sort(treeRows);
+					drawablesPanel.clearSelectedIds();
+					for (int i = 0; i < treeRows.length; i++) {
+						TreePath p = tree.getPathForRow(treeRows[i]);
+						if (p.getLastPathComponent() instanceof DrawnElement) {
+							DrawnElement de = (DrawnElement) p.getLastPathComponent();
+							drawablesPanel.addSelectedId(de.getDrawable().getId());
+						}
+					}
+				}
+				if (SwingUtilities.isRightMouseButton(e)) {
+					if (!isRowSelected(tree.getSelectionRows(), rowIndex) && !SwingUtil.isShiftDown(e)) {
+						tree.clearSelection();
+						tree.addSelectionInterval(rowIndex, rowIndex);
+						drawablesPanel.clearSelectedIds();
+					}
+					final int x = e.getX();
+					final int y = e.getY();
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							DrawnElement firstElement = null;
+							Set<GUID> selectedDrawSet = new HashSet<GUID>();
+							for (TreePath path : tree.getSelectionPaths()) {
+								if (path.getLastPathComponent() instanceof DrawnElement) {
+									DrawnElement de = (DrawnElement) path.getLastPathComponent();
+									if (firstElement == null) {
+										firstElement = de;
+									}
+									selectedDrawSet.add(de.getDrawable().getId());
+								}
+							}
+							if (!selectedDrawSet.isEmpty()) {
+								try {
+									new DrawPanelPopupMenu(selectedDrawSet, x, y, getCurrentZoneRenderer(), firstElement).showPopup(tree);
+								} catch (IllegalComponentStateException icse) {
+									log.info(tree.toString(), icse);
+								}
+							}
+						}
+					});
+				}
+			}
+
+		});
+		// Add Zone Change event
+		MapTool.getEventDispatcher().addListener(new AppEventListener() {
+			public void handleAppEvent(AppEvent event) {
+				drawPanelTreeModel.setZone((Zone) event.getNewValue());
+			}
+		}, MapTool.ZoneEvent.Activated);
+		return splitPane;
+	}
+
+	// Used to redraw the Draw Tree Panel after actions have been called
+	public void updateDrawTree() {
+		if (drawPanelTreeModel != null) {
+			drawPanelTreeModel.update();
+			drawablesPanel.clearSelectedIds();
+		}
+	}
+
 	private JComponent createTokenTreePanel() {
 		final JTree tree = new JTree();
 		tokenPanelTreeModel = new TokenPanelTreeModel(tree);
@@ -839,7 +991,7 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 				Object row = path.getLastPathComponent();
 				int rowIndex = tree.getRowForLocation(e.getX(), e.getY());
 				if (SwingUtilities.isLeftMouseButton(e)) {
-					if (!SwingUtil.isShiftDown(e)) {
+					if (!SwingUtil.isShiftDown(e) && !SwingUtil.isControlDown(e)) {
 						tree.clearSelection();
 					}
 					tree.addSelectionInterval(rowIndex, rowIndex);
@@ -848,13 +1000,9 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 						if (e.getClickCount() == 2) {
 							Token token = (Token) row;
 							getCurrentZoneRenderer().clearSelectedTokens();
-							getCurrentZoneRenderer().centerOn(new ZonePoint(token.getX(), token.getY()));
-
 							// Pick an appropriate tool
-							getToolbox().setSelectedTool(token.isToken() ? PointerTool.class : StampTool.class);
-							getCurrentZoneRenderer().setActiveLayer(token.getLayer());
-							getCurrentZoneRenderer().selectToken(token.getId());
-							getCurrentZoneRenderer().requestFocusInWindow();
+							// Jamz: why not just call .centerOn(Token token), now we have one place to fix...
+							getCurrentZoneRenderer().centerOn(token);
 						}
 					}
 				}
@@ -1067,6 +1215,10 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 		return assetPanel;
 	}
 
+	public DrawablesPanel getDrawablesPanel() {
+		return drawablesPanel;
+	}
+
 	public void addAssetRoot(File rootDir) {
 		assetPanel.addAssetRoot(new AssetDirectory(rootDir, AppConstants.IMAGE_FILE_FILTER));
 	}
@@ -1216,14 +1368,14 @@ public class MapToolFrame extends DefaultDockableHolder implements WindowListene
 
 		// Under mac os x this does not properly hide the menu bar so adjust top and height
 		// so menu bar does not overlay screen.
-		if (MapTool.MAC_OS_X) {
+		if (AppUtil.MAC_OS_X) {
 			fullScreenFrame.setBounds(bounds.x, bounds.y + 21, bounds.width, bounds.height - 21);
 		} else {
 			fullScreenFrame.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
 		}
 		fullScreenFrame.setJMenuBar(menuBar);
 		// Menu bar is visible anyways on MAC so leave menu items on it
-		if (!MapTool.MAC_OS_X)
+		if (!AppUtil.MAC_OS_X)
 			menuBar.setVisible(false);
 
 		fullScreenFrame.setVisible(true);
