@@ -130,7 +130,7 @@ public class Input extends VarArgFunction {
 									token = true;
 									options.put("ICON", "TRUE");
 								}
-								MapToolToken t = (MapToolToken)val;
+								MapToolToken t = (MapToolToken) val;
 								v.add(t.rawget("name").toString() + t.rawget("image").toString());
 								o.add(val);
 							} else {
@@ -155,7 +155,7 @@ public class Input extends VarArgFunction {
 					} else {
 						varSpecs.add(new VarSpec(inputType, name.checkjstring(), v, prompt.isnil() ? name.checkjstring() : prompt.toString(), options, o));
 					}
-					
+
 				}
 			} catch (VarSpec.SpecifierException se) {
 				throw new ParameterException(se.msg);
@@ -226,7 +226,7 @@ public class Input extends VarArgFunction {
 						Integer index = ((JComboBox) comp).getSelectedIndex();
 						if (vs.optionValues.optionEquals("VALUE", "OBJECT")) {
 							if (vs.objectList != null) {
-								newValue = (LuaValue)vs.objectList.get(index);
+								newValue = (LuaValue) vs.objectList.get(index);
 							} else {
 								newValue = valueOf(vs.valueList.get(index).trim());
 							}
@@ -258,7 +258,7 @@ public class Input extends VarArgFunction {
 						}
 						if (vs.optionValues.optionEquals("VALUE", "OBJECT")) {
 							if (vs.objectList != null) {
-								newValue = (LuaValue)vs.objectList.get(index);
+								newValue = (LuaValue) vs.objectList.get(index);
 							} else {
 								newValue = valueOf(vs.valueList.get(index).trim());
 							}

@@ -28,7 +28,7 @@ public class Info extends OneArgFunction {
 		} catch (ParserException e) {
 			throw new LuaError(e);
 		}
-		
+
 		return NIL;
 	}
 

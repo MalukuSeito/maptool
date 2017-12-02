@@ -422,12 +422,12 @@ public class TokenMoveFunctions extends AbstractFunction {
 		}
 		return null;
 	}
-	
+
 	public static String getMovement(final Token source) throws ParserException {
 		Object c = getMovementValue(source);
 		if (c instanceof Double) {
-			 return String.format("%.1f", c);
-		} 
+			return String.format("%.1f", c);
+		}
 		if (c instanceof Integer) {
 			return c.toString();
 		}

@@ -24,12 +24,14 @@ public class PrintRoll extends VarArgFunction {
 	boolean newContext = false;
 	private Globals globals;
 	private OptionType option;
+
 	public PrintRoll(MapToolVariableResolver resolver, boolean newContext, MapToolLineParser.OptionType output, Globals globals) {
 		this.resolver = resolver;
 		this.newContext = newContext;
 		this.globals = globals;
 		this.option = output;
 	}
+
 	@Override
 	public Varargs invoke(Varargs args) {
 		MapToolVariableResolver macroResolver = resolver;
@@ -98,9 +100,9 @@ public class PrintRoll extends VarArgFunction {
 			default:
 				return NONE;
 			}
-			
+
 			Result result = MapTool.getParser().parseExpression(macroResolver, macroResolver.getTokenInContext(), macro);
-			
+
 			switch (output) {
 			case NONE:
 				break;
@@ -159,5 +161,5 @@ public class PrintRoll extends VarArgFunction {
 			throw new LuaError(e);
 		}
 		return NONE;
-	}	
+	}
 }

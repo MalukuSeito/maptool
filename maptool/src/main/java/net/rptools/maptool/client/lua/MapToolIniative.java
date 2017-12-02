@@ -19,6 +19,7 @@ import org.luaj.vm2.LuaValue;
 
 public class MapToolIniative extends LuaTable {
 	MapToolVariableResolver resolver;
+
 	public MapToolIniative(MapToolVariableResolver res) {
 		resolver = res;
 		super.rawset(valueOf("current"), valueOf(-1));
@@ -43,7 +44,7 @@ public class MapToolIniative extends LuaTable {
 
 	public void rawset(LuaValue key, LuaValue value) {
 		InitiativeList list = MapTool.getFrame().getCurrentZoneRenderer().getZone().getInitiativeList();
-		
+
 		if (!MapTool.getParser().isMacroTrusted()) {
 			if (!MapTool.getFrame().getInitiativePanel().hasGMPermission())
 				throw new LuaError(new ParserException(I18N.getText("macro.function.initiative.mustBeGM", "setCurrentInitiative")));
@@ -64,7 +65,7 @@ public class MapToolIniative extends LuaTable {
 
 	@Override
 	public LuaValue rawget(LuaValue key) {
-		InitiativeList list = MapTool.getFrame().getCurrentZoneRenderer().getZone().getInitiativeList();		
+		InitiativeList list = MapTool.getFrame().getCurrentZoneRenderer().getZone().getInitiativeList();
 		boolean hideNPCs = list.isHideNPC();
 		if (key.isstring()) {
 			if (key.checkjstring().equals("current")) {
@@ -86,7 +87,7 @@ public class MapToolIniative extends LuaTable {
 				return valueOf(list.getRound());
 			} else if (key.checkjstring().equals("map")) {
 				return valueOf(list.getZone().getName());
-			}  else if (key.checkjstring().equals("size")) {
+			} else if (key.checkjstring().equals("size")) {
 				int count = 0;
 				for (TokenInitiative ti : list.getTokens()) {
 					if (!MapTool.getParser().isMacroTrusted() && !InitiativeListModel.isTokenVisible(ti.getToken(), hideNPCs))
@@ -131,4 +132,3 @@ public class MapToolIniative extends LuaTable {
 		return tojstring();
 	}
 }
-

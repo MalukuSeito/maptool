@@ -33,7 +33,8 @@ public class Distance extends VarArgFunction {
 				throw new LuaError(I18N.getText("macro.function.general.noPerm", "getDistance"));
 			}
 			if (args.arg(1).isint() && args.arg(2).isint()) {
-				return valueOf(TokenLocationFunctions.getDistance(token.getToken(), args.arg(1).toint(), args.arg(2).toint(), args.isnil(3) || args.checkboolean(3), args.isnil(4) ? null : args.checkjstring(4)));
+				return valueOf(TokenLocationFunctions.getDistance(token.getToken(), args.arg(1).toint(), args.arg(2).toint(), args.isnil(3) || args.checkboolean(3),
+						args.isnil(4) ? null : args.checkjstring(4)));
 			} else if (args.arg(1) instanceof MapToolToken) {
 				MapToolToken t = (MapToolToken) args.arg(1);
 				if (t.visibleToMe() || MapTool.getParser().isMacroTrusted()) {

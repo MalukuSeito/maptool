@@ -40,9 +40,9 @@ public class VBLLib extends TwoArgFunction {
 		ZoneRenderer renderer = MapTool.getFrame().getCurrentZoneRenderer();
 		if (!MapTool.getParser().isMacroPathTrusted())
 			throw new LuaError(new ParserException(I18N.getText("macro.function.general.noPerm", erase ? "VBL.erase" : "VBL.draw")));
-		
+
 		for (int i = 1; i <= args.narg(); i++) {
-			
+
 			Object arg = LuaConverters.toJson(args.arg(i)).toString().toLowerCase();
 			arg = JSONMacroFunctions.convertToJSON((String) arg);
 			if (!(arg instanceof JSONObject)) {
@@ -73,7 +73,7 @@ public class VBLLib extends TwoArgFunction {
 		}
 		return NONE;
 	}
-	
+
 	private static LuaValue getV(Varargs args, boolean simple) {
 		ZoneRenderer renderer = MapTool.getFrame().getCurrentZoneRenderer();
 		if (!MapTool.getParser().isMacroPathTrusted())
@@ -98,8 +98,7 @@ public class VBLLib extends TwoArgFunction {
 		}
 		return LuaConverters.fromJson(getAreaPoints(vblArea, simple));
 	}
-	
-		
+
 	public static final class VBL extends VarArgFunction {
 		@Override
 		public Varargs invoke(Varargs args) {
@@ -107,14 +106,14 @@ public class VBLLib extends TwoArgFunction {
 				RunData.setCurrent(new RunData(new Result("")));
 			}
 			switch (opcode) {
-				case 0:
-					return draw(args, false);
-				case 1:
-					return draw(args, true);
-				case 2:
-					return getV(args, false);
-				case 3:
-					return getV(args, true);
+			case 0:
+				return draw(args, false);
+			case 1:
+				return draw(args, true);
+			case 2:
+				return getV(args, false);
+			case 3:
+				return getV(args, true);
 			}
 			return NIL;
 		}
@@ -125,13 +124,11 @@ public class VBLLib extends TwoArgFunction {
 	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable t = new LuaTable();
-		bind(t, VBL.class, new String[] {"draw", "erase", "get", "getSimple"});
+		bind(t, VBL.class, new String[] { "draw", "erase", "get", "getSimple" });
 		env.set("VBL", t);
 		env.get("package").get("loaded").set("VBL", t);
 		return t;
 	}
-
-	
 
 	public static void checkTrusted(String cls) {
 		if (!MapTool.getParser().isMacroTrusted()) {

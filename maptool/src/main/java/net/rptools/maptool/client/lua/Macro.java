@@ -28,10 +28,10 @@ import org.luaj.vm2.Varargs;
  *
  */
 
-public class Macro extends LuaTable 
+public class Macro extends LuaTable
 //	implements IRepresent Bad choice, since it needs to be able to be converted into a strProp or JSON list for setProps 
-	{
-	
+{
+
 	private static class RunDelegate extends LuaFunction {
 		private int macro;
 		private final MapToolToken token;
@@ -44,31 +44,32 @@ public class Macro extends LuaTable
 			this.resolver = resolver;
 			this.convertToArray = convertToArray;
 		}
+
 		@Override
 		public LuaValue call() {
 			return invoke(LuaValue.NONE).arg1();
 		}
-		
+
 		@Override
 		public LuaValue call(LuaValue arg) {
 			return invoke(varargsOf(arg, NONE)).arg1();
 		}
-		
+
 		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2) {
 			return invoke(varargsOf(arg1, arg2)).arg1();
 		}
-		
+
 		@Override
 		public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
 			return invoke(varargsOf(arg1, arg2, arg3)).arg1();
 		}
-		
+
 		@Override
 		public LuaValue call(String arg) {
 			return invoke(varargsOf(valueOf(arg), NONE)).arg1();
 		}
-		
+
 		@Override
 		public Varargs invoke(Varargs args) {
 			MacroButtonProperties mbp = token.getToken().getMacro(macro, true);
@@ -81,7 +82,7 @@ public class Macro extends LuaTable
 			return runMacro(macroResolver, macroResolver.getTokenInContext(), macroContext, macroBody, args, convertToArray);
 		}
 	}
-	
+
 	public class MacroCompare extends LuaTable {
 		public LuaValue setmetatable(LuaValue metatable) {
 			return error("table is read-only");
@@ -388,27 +389,27 @@ public class Macro extends LuaTable
 	public LuaValue call() {
 		return invoke(LuaValue.NONE).arg1();
 	}
-	
+
 	@Override
 	public LuaValue call(LuaValue arg) {
 		return invoke(varargsOf(arg, NONE)).arg1();
 	}
-	
+
 	@Override
 	public LuaValue call(LuaValue arg1, LuaValue arg2) {
 		return invoke(varargsOf(arg1, arg2)).arg1();
 	}
-	
+
 	@Override
 	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
 		return invoke(varargsOf(arg1, arg2, arg3)).arg1();
 	}
-	
+
 	@Override
 	public LuaValue call(String arg) {
 		return invoke(varargsOf(valueOf(arg), NONE)).arg1();
 	}
-	
+
 	@Override
 	public Varargs invoke(Varargs args) {
 		MacroButtonProperties mbp = token.getToken().getMacro(macro, true);
@@ -442,7 +443,7 @@ public class Macro extends LuaTable
 			String macroOutput = MapTool.getParser().runMacroBlock(macroResolver, tokenInContext, macroBody, macroContext);
 			// Copy the return value of the macro into our current variable scope.
 			Object retval = macroResolver.getVariable("macro.return");
-			
+
 			if (macroOutput != null) {
 				// Note! Its important that trim is not used to replace the following two lines.
 				// If you use String.trim() you may inadvertnatly remove the special characters
@@ -450,7 +451,7 @@ public class Macro extends LuaTable
 				macroOutput = macroOutput.replaceAll("^\\s+", "");
 				macroOutput = macroOutput.replaceAll("\\s+$", "");
 			}
-			return varargsOf(new LuaValue[] {LuaConverters.fromJson(retval), valueOf(macroOutput), LuaConverters.fromObj(retval)});
+			return varargsOf(new LuaValue[] { LuaConverters.fromJson(retval), valueOf(macroOutput), LuaConverters.fromObj(retval) });
 		} catch (ParserException e) {
 			throw new LuaError(e);
 		}
@@ -475,15 +476,15 @@ public class Macro extends LuaTable
 		return tojstring();
 	}
 
-//	@Override
-//	public Object export() {
-//		try {
-//			MacroButtonProperties mbp = token.getToken().getMacro(macro, true);
-//			if (mbp != null) {
-//				return mbp.getLabel() + "@" + token.getToken().getName();
-//			}
-//		} catch (Exception e) {
-//		}
-//		return null;
-//	}
+	//	@Override
+	//	public Object export() {
+	//		try {
+	//			MacroButtonProperties mbp = token.getToken().getMacro(macro, true);
+	//			if (mbp != null) {
+	//				return mbp.getLabel() + "@" + token.getToken().getName();
+	//			}
+	//		} catch (Exception e) {
+	//		}
+	//		return null;
+	//	}
 }

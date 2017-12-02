@@ -30,15 +30,15 @@ public class DiceLib extends TwoArgFunction {
 	public static LuaValue roll(LuaValue arg, LuaValue arg2) {
 		return LuaValue.valueOf(DiceHelper.rollDice(arg.checkint(), arg2.checkint()));
 	}
-	
+
 	public static LuaValue fudge(LuaValue arg) {
 		return LuaValue.valueOf(DiceHelper.fudgeDice(arg.checkint()));
 	}
-	
+
 	public static LuaValue ubiquity(LuaValue arg) {
 		return LuaValue.valueOf(DiceHelper.ubiquityDice(arg.checkint()));
 	}
-	
+
 	public static LuaValue hero(LuaValue arg, LuaValue arg2) {
 		LuaTable result = new LuaTable();
 		int body = 0;
@@ -79,9 +79,9 @@ public class DiceLib extends TwoArgFunction {
 		result.set("stun", LuaValue.valueOf(stun));
 		result.set("body", LuaValue.valueOf(body));
 		return result;
-		
+
 	}
-	
+
 	public static LuaValue herokilling(LuaValue arg, LuaValue arg2, LuaValue mult, LuaValue extraarg, boolean killing2) {
 		LuaTable result = new LuaTable();
 		double times = arg.checkdouble();
@@ -141,12 +141,11 @@ public class DiceLib extends TwoArgFunction {
 		result.set("multiplied", body * multi);
 		return result;
 	}
-	
-	
+
 	public static LuaValue sr4(LuaValue arg, LuaValue arg2, boolean asplode) {
 		return LuaValue.valueOf(DiceHelper.countShadowRun4(arg.checkint(), arg2.checkint(), asplode));
 	}
-	
+
 	public static LuaValue explode(LuaValue arg, LuaValue arg2) {
 		try {
 			return LuaValue.valueOf(DiceHelper.explodeDice(arg.checkint(), arg2.checkint()));
@@ -154,10 +153,11 @@ public class DiceLib extends TwoArgFunction {
 			throw new LuaError(e);
 		}
 	}
-	
+
 	public static LuaValue success(LuaValue arg, LuaValue arg2, LuaValue arg3) {
 		return LuaValue.valueOf(DiceHelper.countSuccessDice(arg.checkint(), arg2.checkint(), arg3.checkint()));
 	}
+
 	public static LuaValue drop(LuaValue arg, LuaValue arg2, LuaValue arg3) {
 		try {
 			return LuaValue.valueOf(DiceHelper.dropDice(arg.checkint(), arg2.checkint(), arg3.checkint()));
@@ -165,6 +165,7 @@ public class DiceLib extends TwoArgFunction {
 			throw new LuaError(e);
 		}
 	}
+
 	public static LuaValue explodingSuccess(LuaValue arg, LuaValue arg2, LuaValue arg3) {
 		try {
 			return LuaValue.valueOf(DiceHelper.explodingSuccessDice(arg.checkint(), arg2.checkint(), arg3.checkint()));
@@ -172,6 +173,7 @@ public class DiceLib extends TwoArgFunction {
 			throw new LuaError(e);
 		}
 	}
+
 	public static LuaValue keep(LuaValue arg, LuaValue arg2, LuaValue arg3) {
 		try {
 			return LuaValue.valueOf(DiceHelper.keepDice(arg.checkint(), arg2.checkint(), arg3.checkint()));
@@ -179,6 +181,7 @@ public class DiceLib extends TwoArgFunction {
 			throw new LuaError(e);
 		}
 	}
+
 	public static LuaValue reroll(LuaValue arg, LuaValue arg2, LuaValue arg3) {
 		try {
 			return LuaValue.valueOf(DiceHelper.rerollDice(arg.checkint(), arg2.checkint(), arg3.checkint()));
@@ -186,73 +189,74 @@ public class DiceLib extends TwoArgFunction {
 			throw new LuaError(e);
 		}
 	}
+
 	public static final class Dice1 extends OneArgFunction {
 		public LuaValue call(LuaValue arg) {
 			if (!RunData.hasCurrent()) {
 				RunData.setCurrent(new RunData(new Result("")));
 			}
 			switch (opcode) {
-				case 0:
-				case 1:
-					return fudge(arg);
-				case 2:
-				case 3:
-					return ubiquity(arg);
-				}
-				return NIL;
+			case 0:
+			case 1:
+				return fudge(arg);
+			case 2:
+			case 3:
+				return ubiquity(arg);
+			}
+			return NIL;
 		}
 	}
-	
+
 	public static final class Dice2 extends TwoArgFunction {
 		public LuaValue call(LuaValue arg, LuaValue arg2) {
 			if (!RunData.hasCurrent()) {
 				RunData.setCurrent(new RunData(new Result("")));
 			}
 			switch (opcode) {
-				case 0:
-				case 1:
-				case 2:
-					return roll(arg, arg2);
-				case 3:
-					return explode(arg, arg2);
-				case 4:
-					return hero(arg, arg2);
-				case 5:
-					return sr4(arg, arg2, false);
-				case 6:
-					return sr4(arg, arg2, true);
+			case 0:
+			case 1:
+			case 2:
+				return roll(arg, arg2);
+			case 3:
+				return explode(arg, arg2);
+			case 4:
+				return hero(arg, arg2);
+			case 5:
+				return sr4(arg, arg2, false);
+			case 6:
+				return sr4(arg, arg2, true);
 			}
 			return NIL;
 		}
 	}
-	
+
 	public static final class Dice3 extends ThreeArgFunction {
 		public LuaValue call(LuaValue arg, LuaValue arg2, LuaValue arg3) {
 			if (!RunData.hasCurrent()) {
 				RunData.setCurrent(new RunData(new Result("")));
 			}
 			switch (opcode) {
-				case 0:
-				case 1:
-				case 2:
-					return success(arg, arg2, arg3);
-				case 3:
-				case 4:
-					return drop(arg, arg2, arg3);
-				case 5:
-				case 6:
-					return explodingSuccess(arg, arg2, arg3);
-				case 7:
-				case 8:
-					return keep(arg, arg2, arg3);
-				case 9:
-				case 10:
-					return reroll(arg, arg2, arg3);
+			case 0:
+			case 1:
+			case 2:
+				return success(arg, arg2, arg3);
+			case 3:
+			case 4:
+				return drop(arg, arg2, arg3);
+			case 5:
+			case 6:
+				return explodingSuccess(arg, arg2, arg3);
+			case 7:
+			case 8:
+				return keep(arg, arg2, arg3);
+			case 9:
+			case 10:
+				return reroll(arg, arg2, arg3);
 			}
 			return NIL;
 		}
 	}
-	
+
 	public static final class Dice4 extends VarArgFunction {
 		@Override
 		public Varargs invoke(Varargs args) {
@@ -260,10 +264,10 @@ public class DiceLib extends TwoArgFunction {
 				RunData.setCurrent(new RunData(new Result("")));
 			}
 			switch (opcode) {
-				case 0:
-					return herokilling(args.arg(1), args.arg(2), args.arg(3), args.arg(4), false);
-				case 1:
-					return herokilling(args.arg(1), args.arg(2), args.arg(3), args.arg(4), true);
+			case 0:
+				return herokilling(args.arg(1), args.arg(2), args.arg(3), args.arg(4), false);
+			case 1:
+				return herokilling(args.arg(1), args.arg(2), args.arg(3), args.arg(4), true);
 			}
 			return NIL;
 		}
@@ -274,16 +278,14 @@ public class DiceLib extends TwoArgFunction {
 	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable t = new LuaTable();
-		bind(t, Dice1.class, new String[] { "f", "fudge",  "u", "ubiquity"});
-		bind(t, Dice2.class, new String[] { "dice", "d", "roll",  "explode",  "hero",  "sr4",  "sr4e"});
-		bind(t, Dice3.class, new String[] { "countsuccess", "countSuccess", "success",  "drop", "dd",  "explodingSuccess", "explodingsuccess",  "keep", "k",  "reroll", "rr"});
-		bind(t, Dice4.class, new String[] {"herokilling", "herokilling2",});
+		bind(t, Dice1.class, new String[] { "f", "fudge", "u", "ubiquity" });
+		bind(t, Dice2.class, new String[] { "dice", "d", "roll", "explode", "hero", "sr4", "sr4e" });
+		bind(t, Dice3.class, new String[] { "countsuccess", "countSuccess", "success", "drop", "dd", "explodingSuccess", "explodingsuccess", "keep", "k", "reroll", "rr" });
+		bind(t, Dice4.class, new String[] { "herokilling", "herokilling2", });
 		env.set("dice", t);
 		env.get("package").get("loaded").set("dice", t);
 		return t;
 	}
-
-	
 
 	public static void checkTrusted(String cls) {
 		if (!MapTool.getParser().isMacroTrusted()) {

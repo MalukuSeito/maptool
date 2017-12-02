@@ -170,14 +170,14 @@ public class TokensLib extends TwoArgFunction {
 			throw new LuaError(e);
 		}
 	}
-	
+
 	public LuaValue getLibProperty(LuaValue name, LuaValue location) {
 		try {
 			String loc;
 			MapToolToken token = null;
 			if (location.isstring()) {
 				loc = location.checkjstring();
-			} else if (location instanceof MapToolToken)  {
+			} else if (location instanceof MapToolToken) {
 				loc = ((MapToolToken) location).getToken().getName();
 				if (((MapToolToken) location).isLib()) {
 					token = (MapToolToken) location;
@@ -199,14 +199,14 @@ public class TokensLib extends TwoArgFunction {
 			throw new LuaError(e);
 		}
 	}
-	
+
 	public LuaValue getLibProperties(LuaValue location) {
 		try {
 			String loc;
 			MapToolToken token = null;
 			if (location.isstring()) {
 				loc = location.checkjstring();
-			} else if (location instanceof MapToolToken)  {
+			} else if (location instanceof MapToolToken) {
 				loc = ((MapToolToken) location).getToken().getName();
 				if (((MapToolToken) location).isLib()) {
 					token = (MapToolToken) location;
@@ -228,14 +228,14 @@ public class TokensLib extends TwoArgFunction {
 			throw new LuaError(e);
 		}
 	}
-	
+
 	public LuaValue getMatchingLibProperties(LuaValue location, LuaValue pattern) {
 		try {
 			String loc;
 			MapToolToken token = null;
 			if (location.isstring()) {
 				loc = location.checkjstring();
-			} else if (location instanceof MapToolToken)  {
+			} else if (location instanceof MapToolToken) {
 				loc = ((MapToolToken) location).getToken().getName();
 				if (((MapToolToken) location).isLib()) {
 					token = (MapToolToken) location;
@@ -382,8 +382,7 @@ public class TokensLib extends TwoArgFunction {
 	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable t = new LuaTable();
-		
-		
+
 		bind(t, 1, new String[] { "withState", "ownedBy", "visible", "inLayers", "resolve", "find", "addAllToInitiative", "addAllPCsToInitiative", "addAllNPCsToInitiative", "getLibProperties" });
 		bind(t, 0, new String[] { "exposed", "all", "pc", "npc", "selected", "impersonated", });
 		bind(t, 2, new String[] { "image", "getLibProperty", "getMatchingLibProperties" });
@@ -394,27 +393,31 @@ public class TokensLib extends TwoArgFunction {
 		return t;
 	}
 
-	protected void bind(LuaValue env, int cls,  String[] names ) {
-		bind( env, cls, names, 0 );
+	protected void bind(LuaValue env, int cls, String[] names) {
+		bind(env, cls, names, 0);
 	}
-	
-	protected void bind(LuaValue env, int cls,  String[] names, int firstopcode ) {
+
+	protected void bind(LuaValue env, int cls, String[] names, int firstopcode) {
 		try {
-			for ( int i=0, n=names.length; i<n; i++ ) {
+			for (int i = 0, n = names.length; i < n; i++) {
 				LibFunction f = newInstance(cls, firstopcode + i, names[i]);
 				env.set(names[i], f);
 			}
-		} catch ( Exception e ) {
-			throw new LuaError( "bind failed: "+e );
+		} catch (Exception e) {
+			throw new LuaError("bind failed: " + e);
 		}
-	}	
-	
+	}
+
 	private LibFunction newInstance(int cls, int opcode, String name) {
 		switch (cls) {
-		case 1: return new Tokens1(opcode, name);
-		case 2: return new Tokens2(opcode, name);
-		case 0: return new Tokens0(opcode, name);
-		default: throw new IllegalArgumentException("Unknown class: " + cls);
+		case 1:
+			return new Tokens1(opcode, name);
+		case 2:
+			return new Tokens2(opcode, name);
+		case 0:
+			return new Tokens0(opcode, name);
+		default:
+			throw new IllegalArgumentException("Unknown class: " + cls);
 		}
 	}
 

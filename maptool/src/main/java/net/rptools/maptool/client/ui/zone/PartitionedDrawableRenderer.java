@@ -139,7 +139,7 @@ public class PartitionedDrawableRenderer implements DrawableRenderer {
 				timer.stop("render:DrawImage");
 
 				// DEBUG: Partition boundaries
-				if (log.isDebugEnabled()) { // Show partition boundaries
+				if (false && log.isDebugEnabled()) { // Show partition boundaries
 					if (!messageLogged) {
 						messageLogged = true;
 						log.debug("DEBUG logging of " + this.getClass().getSimpleName() + " causes colored rectangles and message strings.");

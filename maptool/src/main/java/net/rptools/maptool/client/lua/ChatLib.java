@@ -23,11 +23,13 @@ import org.luaj.vm2.lib.TwoArgFunction;
 public class ChatLib extends TwoArgFunction {
 	private MapToolVariableResolver resolver;
 	private Globals globals;
+
 	public ChatLib(MapToolVariableResolver resolver, Globals globals) {
 		super();
 		this.resolver = resolver;
 		this.globals = globals;
 	}
+
 	@Override
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable t = new LuaTable();
@@ -43,7 +45,7 @@ public class ChatLib extends TwoArgFunction {
 		t.set("gmtt", new PrintRoll(resolver, false, OptionType.GMTT, globals));
 		t.set("selftt", new PrintRoll(resolver, false, OptionType.SELFTT, globals));
 		LuaTable players = new LuaTable();
-		for (Player p: MapTool.getPlayerList()) {
+		for (Player p : MapTool.getPlayerList()) {
 			players.insert(0, valueOf(p.getName()));
 		}
 		t.set("players", new ReadOnlyLuaTable(players));

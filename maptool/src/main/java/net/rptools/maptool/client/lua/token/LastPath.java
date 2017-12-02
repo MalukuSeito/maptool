@@ -15,13 +15,14 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 
 public class LastPath extends OneArgFunction {
-	
+
 	MapToolToken token;
-	
+
 	public LastPath(MapToolToken token) {
 		super();
 		this.token = token;
 	}
+
 	@Override
 	public LuaValue call(LuaValue arg) {
 		boolean units = arg.isboolean() ? arg.toboolean() : true;

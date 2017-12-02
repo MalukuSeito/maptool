@@ -11,6 +11,7 @@ import org.luaj.vm2.lib.VarArgFunction;
 
 public class Link extends VarArgFunction {
 	private boolean formatted;
+
 	public Link(boolean formatted) {
 		this.formatted = formatted;
 	}

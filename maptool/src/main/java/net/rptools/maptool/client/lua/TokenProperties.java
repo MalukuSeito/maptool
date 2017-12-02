@@ -31,7 +31,7 @@ public class TokenProperties extends LuaTable {
 		this.token = mapToolToken;
 		//propmap = MapTool.getCampaign().getCampaignProperties().getTokenPropertyList(token.getToken().getPropertyType());
 	}
-	
+
 	public TokenProperties(MapToolToken mapToolToken, String pattern) {
 		this.token = mapToolToken;
 		//propmap = MapTool.getCampaign().getCampaignProperties().getTokenPropertyList(token.getToken().getPropertyType());
@@ -65,7 +65,7 @@ public class TokenProperties extends LuaTable {
 	public LuaValue rawget(LuaValue key) {
 		if (!token.isSelfOrTrustedOrLib()) {
 			throw new LuaError(new ParserException(I18N.getText("macro.function.general.noPerm", "token.getProperty")));
-		
+
 		}
 		return new MapToolTokenProperty(token, key.checkjstring());
 		//return new MapToolTokenProperty(token, key.checkjstring(), propmap);

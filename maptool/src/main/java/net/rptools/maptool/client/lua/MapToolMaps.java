@@ -25,7 +25,7 @@ public class MapToolMaps extends LuaTable {
 	public MapToolMaps(MapToolVariableResolver resolver) {
 		this.resolver = resolver;
 		super.rawset(valueOf("current"), NIL);
-		if (MapTool.getParser().isMacroTrusted()) { 
+		if (MapTool.getParser().isMacroTrusted()) {
 			super.rawset(valueOf("all"), new MapToolMapList(false, resolver));
 		}
 		super.rawset(valueOf("visible"), new MapToolMapList(true, resolver));

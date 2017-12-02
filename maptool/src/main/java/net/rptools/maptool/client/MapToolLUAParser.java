@@ -119,7 +119,7 @@ public class MapToolLUAParser {
 			user_globals.set("getInfo", new Info());
 			user_globals.set("input", new Input(tokenInContext));
 			user_globals.set("_LUA_HEADER", LUA_HEADER);
-	
+
 			bo = new ByteArrayOutputStream();
 			user_globals.STDOUT = new PrintStream(bo);
 			if (line.startsWith(LUA_HEADER)) {
@@ -129,8 +129,8 @@ public class MapToolLUAParser {
 					(context != null ? context.getName() + "@" + context.getSource() : "Chat") + (tokenInContext != null ? " (" + tokenInContext.getName() + ":" + tokenInContext.getId() + ")" : ""),
 					"t", user_globals);
 			LuaValue macroReturn = chunk.call();
-			if (macroReturn.isnoneornil(1) ) {
-//				res.setVariable("macro.return", null);
+			if (macroReturn.isnoneornil(1)) {
+				//				res.setVariable("macro.return", null);
 			} else {
 				res.setVariable("macro.return", LuaConverters.toJson(macroReturn));
 			}
@@ -149,16 +149,17 @@ public class MapToolLUAParser {
 			}
 		} catch (Exception e) {
 			throw new ParserException("Lua initialization Error: " + e.toString());
-			
+
 		}
 		try {
-			if (bo != null) bo.close();
+			if (bo != null)
+				bo.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return bo.toString();
 	}
-	
+
 	public static InputStream compile(InputStream in, String location, LuaValue user_globals) throws IOException {
 		Prototype p = globals.loadPrototype(in, location, "t");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -166,6 +167,5 @@ public class MapToolLUAParser {
 		// We could save dump here and check if location has not been modified to cache the compiled results, but this thing is blazing fast anyway.
 		return new ByteArrayInputStream(out.toByteArray());
 	}
-	
-}
 
+}

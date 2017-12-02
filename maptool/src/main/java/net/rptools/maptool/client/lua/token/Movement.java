@@ -10,13 +10,14 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 public class Movement extends ZeroArgFunction {
-	
+
 	MapToolToken token;
-	
+
 	public Movement(MapToolToken token) {
 		super();
 		this.token = token;
 	}
+
 	@Override
 	public LuaValue call() {
 		if (!token.isSelfOrTrusted()) {

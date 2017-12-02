@@ -1,6 +1,6 @@
 # LUA Support for Maptool
 ## What is Lua?
-[Lua](https://Lua.org/) is a small programming language usually embedded in programs (mostly games) 
+[Lua](https://Lua.org/) is a small programming language usually embedded in programs (mostly games)
 You can try it online under [https://www.Lua.org/demo.html]
 ## How does a macro become a Lua macro?
 Every input (macro, chatline, eval()) that might be macro code is assumed to be a Lua-macro if it starts with the Lua identifier.
@@ -10,12 +10,12 @@ Every input (macro, chatline, eval()) that might be macro code is assumed to be 
 
 ```
 The identifier has to be followed by a newline
-The identifier is both valid LUA and maptool macro language, but prevents the macro interpreter from running it (should LUA not be available) 
+The identifier is both valid LUA and maptool macro language, but prevents the macro interpreter from running it (should LUA not be available)
 ## Major changes
 ### Use print() and println()
 Lua macros do not output anything by default. Everything that needs to be written to the chat-box must be printed.
 ```lua
---{assert(0, "LUA")}-- 
+--{assert(0, "LUA")}--
 gold = 22 --Comments in Lua start with --
 println("You found ", gold, " Gold")
 print("Lucky you")
@@ -27,7 +27,7 @@ Writing to the default Lua output stream has the same effect, however the Lua io
 Lua allows for objects, and under with this in mind, many of the functions and special variables have been grouped in to objects like [token](#token) for a single token, or the [campaign](#campaign) global for the campaign properties
 
 ### String-Lists, String-Property-Lists und JSON-Variables
-These should not be used in LUA, there are functions like [toJSON](#tojson), [fromJSON](#fromjson), [toStr](#tostr) and [fromStr](#fromstr) that provide an interface to normal macros, However, all functions that can be called from Lua use Lua-objects (specifically Luatable). These have direct support in Lua, and can be nested without any hassle. 
+These should not be used in LUA, there are functions like [toJSON](#tojson), [fromJSON](#fromjson), [toStr](#tostr) and [fromStr](#fromstr) that provide an interface to normal macros, However, all functions that can be called from Lua use Lua-objects (specifically Luatable). These have direct support in Lua, and can be nested without any hassle.
 
 In fact JSON-Objects and Arrays are always treated as Text in Lua and use their special-ness they have in the normal macro language, making them slower to use in Lua.
 
@@ -37,14 +37,14 @@ In fact JSON-Objects and Arrays are always treated as Text in Lua and use their 
 local array = {} -- new array (table), similar to json actually, just different brackets
 local filledarray = {1, 2, "Text, with a comma"} -- Array with some contents
 for i=1, 2000 do -- 2000 iterations, so quick you won't notice the difference
-  array[i] = i * 10
+array[i] = i * 10
 end
 for j=1, #array do --#array is the length of the LuaTable named array
-  print(array[j], ", ")
+print(array[j], ", ")
 end
 println()
 for index, text in ipairs(filledarray) do --ipairs iterates over the array part of any table
-  println(index, " is ", text)
+println(index, " is ", text)
 end
 ```
 #### Nested Lists
@@ -52,17 +52,17 @@ end
 --{assert(0, "LUA")}--
 local nested = {} -- new array (table), similar to json actually
 for i=1, 200 do -- 2000 iterations
-  nested[i] = {}
-  for j=1, 2000 do -- 2000*200 iterations
-    nested[i][j] = i*j
-  end
+nested[i] = {}
+for j=1, 2000 do -- 2000*200 iterations
+	nested[i][j] = i*j
+end
 end
 for index, array in ipairs(nested) do
-  local sum = 0 -- sum is only valid in this loop
-  for index2, val in ipairs(array) do -- another 400000 iterations, why not?
-    sum = sum + val; --However printing 400k lines is not good for maptool, so we just sum them up
-  end
-  print(sum, ", ")
+local sum = 0 -- sum is only valid in this loop
+for index2, val in ipairs(array) do -- another 400000 iterations, why not?
+	sum = sum + val; --However printing 400k lines is not good for maptool, so we just sum them up
+end
+print(sum, ", ")
 end
 ```
 #### LuaTables as dictionaries (replaces string property lists and JSON-Objects)
@@ -76,11 +76,11 @@ table["key with spaces"] = variable
 table[variable] = 100
 println("Table: ")
 for key, value in pairs(table) do --pairs iterates over all elements of the table (array-parts included)
-  println(key, " is ", value)
+println(key, " is ", value)
 end
 println("Filled-Table: ")
 for key, value in pairs(filledtable) do
-  println(key, " is ", value)
+println(key, " is ", value)
 end
 ```
 #### Nested tables
@@ -95,7 +95,7 @@ table.moreTable = {1, 4, 9, text="Value"} --mixed table
 println(table.aTable.second)
 println(table.anArray[3])
 for key, value in pairs(table.moreTable) do
-  println(key, " is ", value)
+println(key, " is ", value)
 end
 println("table = ", toJSON(table))
 ```
@@ -109,7 +109,7 @@ Lua macros barely use any stacksize, since Lua manages its own stack in normal m
 ### Parsing/Compiling
 Lua macros are compiled, so execution times are a lot lower. This is very noticable in big frameworks and when using many loops. For single line commands, Lua is often not necessary and might be slower due to the compile time overhead.
 
-### Functions and require 
+### Functions and require
 Lua allows functions to be defined in the same macro they are used in. The require command can load other macros and treat them as Lua-libraries.
 
 ### Nesting Loops
@@ -236,27 +236,27 @@ Lua supports + and .. to add numbers and concatinate strings respektively, howev
 ```lua
 --{assert(0, "LUA")}--
 function sum(...) -- for variable args
-   result = 0;
-   for k, v in ipairs({...}) do
-        result = result + v
-    end 
-  return result
+result = 0;
+for k, v in ipairs({...}) do
+		result = result + v
+	end
+return result
 end
 
 function sumArray(a) -- No varargs, just for arrays
-   result = 0;
-   for k, v in ipairs(a) do
-        result = result + v
-    end 
-  return result
+result = 0;
+for k, v in ipairs(a) do
+		result = result + v
+	end
+return result
 end
 
 function concat(...) -- For Strings
-   result = "";
-   for k, v in ipairs({...}) do
-        result = result .. v
-    end 
-  return result
+result = "";
+for k, v in ipairs({...}) do
+		result = result .. v
+	end
+return result
 end
 
 println(sum(1,2,3,4))
@@ -288,7 +288,7 @@ Or on other tokens (Trusted-Macro or Ownership required)
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.visible()) do
-  tok.addToInitiative(false, index)
+tok.addToInitiative(false, index)
 end
 ```
 
@@ -297,7 +297,7 @@ These are in the macro library and like macro.args convert the arguments into lu
 ```lua
 --{assert(0, "LUA")}--
 for i = 1, macro.argCount() do
-  println("Arg ", i, " = ", macro.arg(i - 1)) -- arg starts at 0, lua starts at 1
+println("Arg ", i, " = ", macro.arg(i - 1)) -- arg starts at 0, lua starts at 1
 end
 ```
 
@@ -314,17 +314,17 @@ There is no direct function to do this, but it can be easily implemented in lua
 ```lua
 --{assert(0, "LUA")}--
 function avg(...) -- for variable args
-   result = 0;
-   count = 0;
-   for k, v in ipairs({...}) do
-        result = result + v
-        count = count + 1
-    end 
-  if count > 0 then
-    return result / count
-  else
-    return 0
-  end
+result = 0;
+count = 0;
+for k, v in ipairs({...}) do
+		result = result + v
+		count = count + 1
+	end
+if count > 0 then
+	return result / count
+else
+	return 0
+end
 end
 
 println(avg(1,2,3,4))
@@ -369,7 +369,7 @@ On other tokens (Trusted-Macro or Ownership required):
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.visible()) do
-  tok.bringToFront()
+tok.bringToFront()
 end
 ```
 
@@ -386,7 +386,7 @@ The function canSee() can be called on any token.
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.visible()) do
-  println("I can See: ", tok.name, " at ", table.concat(token.canSee(tok), ", "))
+println("I can See: ", tok.name, " at ", table.concat(token.canSee(tok), ", "))
 end
 ```
 #### Macro Functions ceil() and ceiling()
@@ -431,7 +431,7 @@ local list = maps.current.copyToken(token, 2, {name="New Name"})
 println(list[1].name)
 println(list[2])
 local ids = table.map(list, function(t)  --As copyToken returns Tokens, we have to get the ids ourselves if we want them
-  return t.id --table.map calls this function once for every element in the list and creates a new list with the result
+return t.id --table.map calls this function once for every element in the list and creates a new list with the result
 end)
 println(ids[1])
 println(ids[2])
@@ -507,12 +507,12 @@ Lua supports the '/'-Operator to divide 2 numbers. A function can be easily impl
 ```lua
 --{assert(0, "LUA")}--
 function divide(...) -- for variable args
-  values = {...}
-  result = table.remove(values, 1)
-  for k, v in ipairs(values) do
-       result = result / v
-  end 
-  return result
+values = {...}
+result = table.remove(values, 1)
+for k, v in ipairs(values) do
+	result = result / v
+end
+return result
 end
 
 println(divide(24, 2, 2))
@@ -591,7 +591,7 @@ They always return 3 values, the first is macro.result converted from JSON. The 
 ```lua
 --{assert(0, "LUA")}--
 export("Bonus", 10)
-local result, output, rawresult = macro.eval("[t: macro.return = 2d10 + Bonus]") 
+local result, output, rawresult = macro.eval("[t: macro.return = 2d10 + Bonus]")
 println(result)
 println(output)
 ```
@@ -621,7 +621,7 @@ local code = {
 	attack="[t: macro.return = 1d20 + Bonus]",
 	damage=_LUA_HEADER.."damage=dice.roll(1,6); print(damage, \" massive damage\"); return damage"
 }
-local result, output, rawresult = macro.eval(code) 
+local result, output, rawresult = macro.eval(code)
 println(result.attack)
 println(output.attack)
 println(result.damage)
@@ -666,7 +666,7 @@ println(dice.fudge(4)) --4df
 In a trusted Macro, tokens.resolve() can be used for this purpose
 ```lua
 --{assert(0, "LUA")}--
-println(tokens.resolve("Test").gm_name) 
+println(tokens.resolve("Test").gm_name)
 ```
 #### Macro Function floor()
 The [Lua Math library](https://www.lua.org/pil/18.html) has a floor() function
@@ -678,16 +678,16 @@ println(math.floor(10.2))
 There is no direct function to do this, but it can be done easily in LUA
 ```lua
 --{assert(0, "LUA")}--
-function formatTable(t, listFormat, entryFormat, seperator) 
-  local values = {}
-  for key, value in pairs(t) do
-    table.insert(values, entryFormat:replace("%key", key):replace("%value", value))
-  end
-  return listFormat:replace("%list",table.concat(values, seperator))
+function formatTable(t, listFormat, entryFormat, seperator)
+local values = {}
+for key, value in pairs(t) do
+	table.insert(values, entryFormat:replace("%key", key):replace("%value", value))
+end
+return listFormat:replace("%list",table.concat(values, seperator))
 end
 
 props = "Strength=14 ; Constitution=8 ; Dexterity=13 ; Intelligence=4 ; Wisdom=18 ; Charisma=9"
-println(formatTable(fromStr(props), "<table border=1>%list</table>", "<tr> <td><b>%key</b></td> <td>%value</td> </tr>", "")) 
+println(formatTable(fromStr(props), "<table border=1>%list</table>", "<tr> <td><b>%key</b></td> <td>%value</td> </tr>", ""))
 --normally Lua-Tables are unsorted, but fromStr() keeps the order from the String Property
 ```
 
@@ -695,12 +695,12 @@ println(formatTable(fromStr(props), "<table border=1>%list</table>", "<tr> <td><
 There is no direct function to do this, but it can be done easily in LUA using the maps library
 ```lua
 --{assert(0, "LUA")}--
-function getAllMapNames() 
-  local values = {}
-  for name, map in pairs(maps.all) do
-    table.insert(values, name)
-  end
-  return values
+function getAllMapNames()
+local values = {}
+for name, map in pairs(maps.all) do
+	table.insert(values, name)
+end
+return values
 end
 
 println(toJSON(getAllMapNames()))
@@ -709,7 +709,7 @@ But you probably want to do something with the map:
 ```lua
 --{assert(0, "LUA")}--
 for name, map in pairs(maps.all) do --Get all Map objects
-  println("Map ", name, " is ", map.visible and "visible" or "invisible")
+println("Map ", name, " is ", map.visible and "visible" or "invisible")
 end
 ```
 
@@ -718,7 +718,7 @@ This value is saved in the table chat.players
 ```lua
 --{assert(0, "LUA")}--
 for index, player in ipairs(chat.players) do
-  println(player, " is logged in") --do something with a player
+println(player, " is logged in") --do something with a player
 end
 
 println(toStr(chat.players, ", ")) --to String list
@@ -729,17 +729,17 @@ There is no direct function to do this, but it can be done easily in LUA using t
 ```lua
 --{assert(0, "LUA")}--
 function getAllPropertyNames(group)
-  local source = campaign.allTokenProperties
-  if group ~= nil then
-    source = campaign.tokenProperties[group]
-  end
-  local values = {}
-  if source then
-    for index, prop in ipairs(source) do
-      table.insert(values, prop.name)
-    end
-  end
-  return values
+local source = campaign.allTokenProperties
+if group ~= nil then
+	source = campaign.tokenProperties[group]
+end
+local values = {}
+if source then
+	for index, prop in ipairs(source) do
+	table.insert(values, prop.name)
+	end
+end
+return values
 end
 
 println(toJSON(getAllPropertyNames()))
@@ -749,7 +749,7 @@ But you probably want to do something with the properties:
 ```lua
 --{assert(0, "LUA")}--
 for index, prop in ipairs(campaign.tokenProperties["NPC"]) do --or campaign.allTokenProperties
-  println(prop.name, " is ", prop.default)
+println(prop.name, " is ", prop.default)
 end
 ```
 
@@ -792,19 +792,19 @@ The tokens library has an exposed() function that collect all exposed tokens, wh
 ```lua
 --{assert(0, "LUA")}--
 function getExposedTokenNames()
-  local result = {}
-  for index, tok in ipairs(tokens.exposed()) do
-    table.insert(result, tok.name)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.exposed()) do
+	table.insert(result, tok.name)
+end
+return result
 end
 
 function getExposedTokens()
-  local result = {}
-  for index, tok in ipairs(tokens.exposed()) do
-    table.insert(result, tok.id)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.exposed()) do
+	table.insert(result, tok.id)
+end
+return result
 end
 
 println(toJSON(getExposedTokenNames()))
@@ -814,7 +814,7 @@ Usually one would want to work with the token objects instead
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.exposed()) do
-  println(tok.name, " is ", tok.label)
+println(tok.name, " is ", tok.label)
 end
 ```
 
@@ -855,13 +855,13 @@ local test =  "Command-20, Sleight of Hand 10, Knowledge (Arcana) +5, Murder +10
 local findCount, groupCount, groups = test:strfind("([^,]*?)\\s?([-+]?\\d+)(,|\$)")
 println("Found: ", findCount, " results with ", groupCount, " Groups each");
 for index, match in ipairs(groups) do
-  print("<b>Match ", index, "</b>")
-  local value, groupStart, groupEnd = match() -- no params or 0 is the 0-group
-  println (" from ", groupStart, " to ", groupEnd, " = ", value) -- end is a reserved word in lua
-  for i = 1, groupCount do
-    local value, groupStart, groupEnd = match(i) -- match is a function that also returns multiple values
-    println ("Group ", i, " from ", groupStart, " to ", groupEnd, " = ", value)
-  end
+print("<b>Match ", index, "</b>")
+local value, groupStart, groupEnd = match() -- no params or 0 is the 0-group
+println (" from ", groupStart, " to ", groupEnd, " = ", value) -- end is a reserved word in lua
+for i = 1, groupCount do
+	local value, groupStart, groupEnd = match(i) -- match is a function that also returns multiple values
+	println ("Group ", i, " from ", groupStart, " to ", groupEnd, " = ", value)
+end
 end
 println("Direct access: ", groups[2](1).."") -- match 2 group 1 only the value
 ```
@@ -915,9 +915,9 @@ The initiative hold (for the current map) is a property of any token
 ```lua
 --{assert(0, "LUA")}--
 if (token.initiativeHold) then
-  println("Holding")
+println("Holding")
 else
-  println("Going")
+println("Going")
 end
 ```
 
@@ -940,9 +940,9 @@ This information is contained in the token property of the initiative library. T
 ```lua
 --{assert(0, "LUA")}--
 if initiative.token then
-  println(initiative.token.name, ", it is your turn")
+println(initiative.token.name, ", it is your turn")
 else
-  println("It's noone's turn right now")
+println("It's noone's turn right now")
 end
 ```
 
@@ -958,7 +958,7 @@ This function getLastPath() can be called on any token
 ```lua
 --{assert(0, "LUA")}--
 for pathpoint, pos in ipairs(token.getLastPath()) do
-  println(toStr(pos))
+println(toStr(pos))
 end
 println(table.indent(token.getLastPath(false)))
 ```
@@ -985,18 +985,18 @@ The Tokens-library has a getLibProperties([Token]) function that returns a table
 ```lua
 --{assert(0, "LUA")}--
 for name, obj in pairs(tokens.getLibProperties("Lib:Library")) do
-  println(name)
+println(name)
 end
 ```
 With this, a getLibPropertyNames function can be easily defined as such:
 ```lua
 --{assert(0, "LUA")}--
 function getLibPropertyNames(tok)
-  local result = {}
-  for name, obj in pairs(tokens.getLibProperties(tok)) do
-    table.insert(result, name)
-  end
-  return result
+local result = {}
+for name, obj in pairs(tokens.getLibProperties(tok)) do
+	table.insert(result, name)
+end
+return result
 end
 
 println(toJSON(getLibPropertyNames("Lib:Library")))
@@ -1007,20 +1007,20 @@ Each token-object has a lights-tables that contains all the lights by category
 ```lua
 --{assert(0, "LUA")}--
 for name, light in pairs(token.lights.D20) do
-  println(name, " is on")
+println(name, " is on")
 end
 ```
 With this, a getLights function for all lights can be defined as such:
 ```lua
 --{assert(0, "LUA")}--
 function getLights()
-  local result = {}
-  for catname, cat in pairs(token.lights) do
-    for lightname, light in pairs(cat) do
-      table.insert(result, lightname)
-    end
-  end
-  return result
+local result = {}
+for catname, cat in pairs(token.lights) do
+	for lightname, light in pairs(cat) do
+	table.insert(result, lightname)
+	end
+end
+return result
 end
 
 println("Active Lights: ", toJSON(getLights()))
@@ -1045,14 +1045,14 @@ There is no direct function to do this, but it can be implemented by iterating t
 ```lua
 --{assert(0, "LUA")}--
 function getMacroGroup(group, tok)
-  tok = tok or token
-  local result = {}
-  for index, macro in pairs(tok.macros) do
-    if macro.group == group then
-      table.insert(result, macro.label)
-    end
-  end
-  return result
+tok = tok or token
+local result = {}
+for index, macro in pairs(tok.macros) do
+	if macro.group == group then
+	table.insert(result, macro.label)
+	end
+end
+return result
 end
 
 println("Macros: ", toJSON(getMacroGroup(""))) --empty group
@@ -1065,14 +1065,14 @@ There is no direct function to do this, but it can be implemented by iterating t
 ```lua
 --{assert(0, "LUA")}--
 function getMacroIndices(label, tok)
-  tok = tok or token
-  local result = {}
-  for index, macro in pairs(tok.macros) do
-    if macro.label == label then
-      table.insert(result, index)
-    end
-  end
-  return result
+tok = tok or token
+local result = {}
+for index, macro in pairs(tok.macros) do
+	if macro.label == label then
+	table.insert(result, index)
+	end
+end
+return result
 end
 
 println("Indices: ", toJSON(getMacroIndices("tokenVarTest")))
@@ -1106,12 +1106,12 @@ There is no direct function to do this, but it can be implemented by iterating t
 ```lua
 --{assert(0, "LUA")}--
 function getMacros(tok)
-  tok = tok or token
-  local result = {}
-  for index, macro in pairs(tok.macros) do
-    table.insert(result, macro.label)
-  end
-  return result
+tok = tok or token
+local result = {}
+for index, macro in pairs(tok.macros) do
+	table.insert(result, macro.label)
+end
+return result
 end
 
 println("Macros: ", toJSON(getMacros())) --current Token
@@ -1132,26 +1132,26 @@ The Tokens-library has a getMatchingLibProperties(Token, Pattern) function that 
 ```lua
 --{assert(0, "LUA")}--
 for name, obj in pairs(tokens.getMatchingLibProperties("Lib:Library", "Weapon.*")) do
-  println(name)
+println(name)
 end
 ```
 The matching ignores the case by default, so to enable case-sensitivity, the pattern (?-i) needs to be added to the front
 ```lua
 --{assert(0, "LUA")}--
 for name, obj in pairs(tokens.getMatchingLibProperties("Lib:Library", "(?-i)Weapon.*")) do
-  println(name)
+println(name)
 end
-``` 
+```
 
 With this, a getMatchingLibPropertiesNames function can be easily defined as such:
 ```lua
 --{assert(0, "LUA")}--
 function getMatchingLibPropertiesNames(pattern, tok)
-  local result = {}
-  for name, obj in pairs(tokens.getMatchingLibProperties(tok, pattern)) do
-    table.insert(result, name)
-  end
-  return result
+local result = {}
+for name, obj in pairs(tokens.getMatchingLibProperties(tok, pattern)) do
+	table.insert(result, name)
+end
+return result
 end
 
 println(toJSON(getMatchingLibPropertiesNames("Weapon.*", "Lib:Library")))
@@ -1163,14 +1163,14 @@ Each Token has a matchingProperties(Pattern) function that returns a table of ma
 ```lua
 --{assert(0, "LUA")}--
 for name, obj in pairs(token.matchingLibProperties("Weapon.*")) do
-  println(name)
+println(name)
 end
 ```
 The matching ignores the case by default, so to enable case-sensitivity, the pattern (?-i) needs to be added to the front
 ```lua
 --{assert(0, "LUA")}--
 for name, obj in pairs(token.matchingLibProperties("(?-i)Weapon.*")) do
-  println(name)
+println(name)
 end
 ```
 There is also a getMatchingProperties() function, that returns just the name
@@ -1207,19 +1207,19 @@ The tokens library has an npc() function that collect all NPCs, which can be use
 ```lua
 --{assert(0, "LUA")}--
 function getNPCNames()
-  local result = {}
-  for index, tok in ipairs(tokens.npc()) do
-    table.insert(result, tok.name)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.npc()) do
+	table.insert(result, tok.name)
+end
+return result
 end
 
 function getNPC()
-  local result = {}
-  for index, tok in ipairs(tokens.npc()) do
-    table.insert(result, tok.id)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.npc()) do
+	table.insert(result, tok.id)
+end
+return result
 end
 
 println(toJSON(getNPCNames()))
@@ -1229,7 +1229,7 @@ Usually one would want to work with the token objects instead
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.npc()) do
-  println(tok.name, " is ", tok.label)
+println(tok.name, " is ", tok.label)
 end
 ```
 
@@ -1238,19 +1238,19 @@ The tokens library has an ownedBy() function that collect all tokens owned by a 
 ```lua
 --{assert(0, "LUA")}--
 function getOwnedNames(player)
-  local result = {}
-  for index, tok in ipairs(tokens.ownedBy(player)) do
-    table.insert(result, tok.name)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.ownedBy(player)) do
+	table.insert(result, tok.name)
+end
+return result
 end
 
 function getOwned(player)
-  local result = {}
-  for index, tok in ipairs(tokens.ownedBy(player)) do
-    table.insert(result, tok.id)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.ownedBy(player)) do
+	table.insert(result, tok.id)
+end
+return result
 end
 
 println(toJSON(getOwnedNames(chat.player)))
@@ -1260,7 +1260,7 @@ Usually one would want to work with the token objects instead
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.ownedBy(chat.player)) do
-  println(tok.name, " is ", tok.label)
+println(tok.name, " is ", tok.label)
 end
 ```
 
@@ -1276,7 +1276,7 @@ This method is part of any token and returns a table of owners
 ```lua
 --{assert(0, "LUA")}--
 for index, owner in ipairs(token.getOwners()) do
-  println(owner)
+println(owner)
 end
 ```
 
@@ -1285,19 +1285,19 @@ The tokens library has an pc() function that collect all PCs, which can be used 
 ```lua
 --{assert(0, "LUA")}--
 function getPCNames()
-  local result = {}
-  for index, tok in ipairs(tokens.pc()) do
-    table.insert(result, tok.name)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.pc()) do
+	table.insert(result, tok.name)
+end
+return result
 end
 
 function getPC()
-  local result = {}
-  for index, tok in ipairs(tokens.pc()) do
-    table.insert(result, tok.id)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.pc()) do
+	table.insert(result, tok.id)
+end
+return result
 end
 
 println(toJSON(getPCNames()))
@@ -1307,7 +1307,7 @@ Usually one would want to work with the token objects instead
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.pc()) do
-  println(tok.name, " is ", tok.label)
+println(tok.name, " is ", tok.label)
 end
 ```
 
@@ -1342,7 +1342,7 @@ There are no direct functions for this, however all properties can be listed by 
 ```lua
 --{assert(0, "LUA")}--
 for key, value in pairs(token.properties) do
-  println(key, " = ", value, " object = ", token.properties[key])
+println(key, " = ", value, " object = ", token.properties[key])
 end
 ```
 
@@ -1350,21 +1350,21 @@ Functions to replace these can be easily created
 ```lua
 --{assert(0, "LUA")}--
 function getPropertyNames(tok)
-  tok = tok or token
-  local result = {}
-  for key in pairs(tok.properties) do
-    table.insert(result, key:lower())
-  end
-  return result
+tok = tok or token
+local result = {}
+for key in pairs(tok.properties) do
+	table.insert(result, key:lower())
+end
+return result
 end
 
 function getPropertyNamesRaw(tok)
-  tok = tok or token
-  local result = {}
-  for key in pairs(tok.properties) do
-    table.insert(result, key)
-  end
-  return result
+tok = tok or token
+local result = {}
+for key in pairs(tok.properties) do
+	table.insert(result, key)
+end
+return result
 end
 
 println(toStr(getPropertyNamesRaw()))
@@ -1386,19 +1386,19 @@ The tokens library has an selected() function that collect all selected tokens, 
 ```lua
 --{assert(0, "LUA")}--
 function getSelectedNames()
-  local result = {}
-  for index, tok in ipairs(tokens.selected()) do
-    table.insert(result, tok.name)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.selected()) do
+	table.insert(result, tok.name)
+end
+return result
 end
 
 function getSelected()
-  local result = {}
-  for index, tok in ipairs(tokens.selected()) do
-    table.insert(result, tok.id)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.selected()) do
+	table.insert(result, tok.id)
+end
+return result
 end
 
 println(toJSON(getSelectedNames()))
@@ -1408,7 +1408,7 @@ Usually one would want to work with the token objects instead
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.selected()) do
-  println(tok.name, " is ", tok.label)
+println(tok.name, " is ", tok.label)
 end
 ```
 
@@ -1431,7 +1431,7 @@ The speech table of a token contains this information
 ```lua
 --{assert(0, "LUA")}--
 for name, value in pairs(token.speech) do
-  println(name, " says: ", value)
+println(name, " says: ", value)
 end
 ```
 
@@ -1440,17 +1440,17 @@ The functions can be created as such:
 ```lua
 --{assert(0, "LUA")}--
 function getSpeech(name, tok)
-  tok = tok or token
-  return tok.speech[name]
+tok = tok or token
+return tok.speech[name]
 end
 
 function getSpeechNames(tok)
-  tok = tok or token
-  local result = {}
-  for key in pairs(tok.speech) do
-    table.insert(result, key)
-  end
-  return result
+tok = tok or token
+local result = {}
+for key in pairs(tok.speech) do
+	table.insert(result, key)
+end
+return result
 end
 
 println(toStr(getSpeechNames()))
@@ -1476,15 +1476,15 @@ With this, the getStateImage function with scaling can be implemented
 ```lua
 --{assert(0, "LUA")}--
 function getStateImage(name, scale)
-  local state = campaign.allStates[name]
-  if state == nil then error("State not defined") end
-  if state.image == nil then error("State is not an Image") end
-  if type(scale) == "number" then 
-    if scale < 1 then scale = 1 end
-    if scale > 500 then scale = 500 end
-    return state.image.."-"..math.floor(scale)
-  end
-  return state.image
+local state = campaign.allStates[name]
+if state == nil then error("State not defined") end
+if state.image == nil then error("State is not an Image") end
+if type(scale) == "number" then
+	if scale < 1 then scale = 1 end
+	if scale > 500 then scale = 500 end
+	return state.image.."-"..math.floor(scale)
+end
+return state.image
 end
 
 println("<img src = \"", getStateImage("Bloodied", 300) , "\">")
@@ -1497,7 +1497,7 @@ Lua has no dedicated String Property and String List function, they have to be c
 println(fromStr("a=blah; b=doh; c=meh")["a"]);
 println(fromStr("a=blah; b=doh; c=meh")["b"]);
 println(fromStr("a=blah, b=doh, c=meh", nil, ",")["c"]); --Change seperator to ","
-``` 
+```
 
 #### Macro Function getTokenDrawOrder()
 The Draw Order is a property of any token:
@@ -1575,19 +1575,19 @@ The condtion can be specified as a lua tables instead of JSON
 ```lua
 --{assert(0, "LUA")}--
 function getTokenNames(condition)
-  local result = {}
-  for index, tok in ipairs(tokens.find(condition)) do
-    table.insert(result, tok.name)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.find(condition)) do
+	table.insert(result, tok.name)
+end
+return result
 end
 
 function getTokens(condition)
-  local result = {}
-  for index, tok in ipairs(tokens.find(condition)) do
-    table.insert(result, tok.id)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.find(condition)) do
+	table.insert(result, tok.id)
+end
+return result
 end
 
 println(toJSON(getTokenNames({layer = {"TOKEN", "HIDDEN", "OBJECT", "BACKGROUND"}})))
@@ -1597,7 +1597,7 @@ Usually one would want to work with the token objects instead
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.find({ range = {upto = 2, distancePerCell = 0}, npc = 1, unsetStates = {"Dead"} })) do
-  println(tok.name, " is ", tok.label)
+println(tok.name, " is ", tok.label)
 end
 ```
 
@@ -1613,10 +1613,10 @@ This information can be extracted from the campaign properties
 ```lua
 --{assert(0, "LUA")}--
 for name in pairs(campaign.allStates) do
-  println(name)
+println(name)
 end
 for name in pairs(campaign.states[group]) do
-  println(name)
+println(name)
 end
 ```
 
@@ -1643,7 +1643,7 @@ println(token.location().x) --or location(true): Pixels
 println(token.location(false).y) --Cells
 ```
 
-#### Macro Function getVBL() 
+#### Macro Function getVBL()
 There are two functions for this in the VBL library: get() and getSimple(), where getSimple() retruns the same as the format of getVBL(shape, format) being 1.
 The functions take and return Lua Tables instead of JSON
 ```lua
@@ -1664,7 +1664,7 @@ The visible table in the maps object has all visible maps
 
 --{assert(0, "LUA")}--
 for name in pairs(maps.visible) do
-  println(name)
+println(name)
 end
 
 #### Macro Function getVisibleTokens() and getVisibleTokenNames()
@@ -1672,19 +1672,19 @@ The tokens library has an visible() function that collect all visible tokens, wh
 ```lua
 --{assert(0, "LUA")}--
 function getVisibleTokenNames()
-  local result = {}
-  for index, tok in ipairs(tokens.visible()) do
-    table.insert(result, tok.name)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.visible()) do
+	table.insert(result, tok.name)
+end
+return result
 end
 
 function getVisibleTokens()
-  local result = {}
-  for index, tok in ipairs(tokens.visible()) do
-    table.insert(result, tok.id)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.visible()) do
+	table.insert(result, tok.id)
+end
+return result
 end
 
 println(toJSON(getVisibleTokenNames()))
@@ -1694,7 +1694,7 @@ Usually one would want to work with the token objects instead
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.visible()) do
-  println(tok.name, " is ", tok.label)
+println(tok.name, " is ", tok.label)
 end
 ```
 
@@ -1703,19 +1703,19 @@ The tokens library has an withState() function that collect all tokens with a st
 ```lua
 --{assert(0, "LUA")}--
 function getWithStateNames(state)
-  local result = {}
-  for index, tok in ipairs(tokens.withState(state)) do
-    table.insert(result, tok.name)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.withState(state)) do
+	table.insert(result, tok.name)
+end
+return result
 end
 
 function getWithState(state)
-  local result = {}
-  for index, tok in ipairs(tokens.withState(state)) do
-    table.insert(result, tok.id)
-  end
-  return result
+local result = {}
+for index, tok in ipairs(tokens.withState(state)) do
+	table.insert(result, tok.id)
+end
+return result
 end
 
 println(toJSON(getWithStateNames("Prone")))
@@ -1725,7 +1725,7 @@ Usually one would want to work with the token objects instead
 ```lua
 --{assert(0, "LUA")}--
 for index, tok in ipairs(tokens.withState(state)) do
-  println(tok.name, " is ", tok.label)
+println(tok.name, " is ", tok.label)
 end
 ```
 
@@ -1823,9 +1823,9 @@ Note, lua will not evaluate both expressions unlike the macro language does
 a = 10
 b = 20
 if a > b then
-  println("A is larger than B")
+println("A is larger than B")
 else
-  println("A is not larger than B")
+println("A is not larger than B")
 end
 
 println(a>b and "A is larger than B" or "A is not larger than B") -- ternary, will not work if the part in "A is larger than B" is false/nil
@@ -1835,17 +1835,17 @@ Lua has no dedicated String Property and String List function, they have to be c
 
 ```lua
 --{assert(0, "LUA")}--
-function indexValueStrProp(prop, index) 
-  if type(prop) ~= "table" then
-    prop = fromStr(prop)
-  end
-  for key, value in pairs(prop) do
-    if index == 0 then 
-      return value
-    end
-    index = index-1
-  end
-  return nil
+function indexValueStrProp(prop, index)
+if type(prop) ~= "table" then
+	prop = fromStr(prop)
+end
+for key, value in pairs(prop) do
+	if index == 0 then
+	return value
+	end
+	index = index-1
+end
+return nil
 end
 
 println(indexValueStrProp("a=blah; b=doh; c=meh", 1));
@@ -1879,7 +1879,7 @@ println(toJSON(input(
 the LIST also supports tokens as content for LIST and RADIO
 
 ```lua
---{assert(0, "LUA")}-- 
+--{assert(0, "LUA")}--
 local selected = input({name = "Token", type = "LIST", content = tokens.visible(), value="object"}) -- VALUE=OBJECT is also a new option
 println(selected.Token.label) --The selected item is still a token object
 println("<img src=\"",selected.Token.image,"\">")
@@ -1890,18 +1890,18 @@ println(toJSON(selected))
 There is no function for this, but any bar that is visible on a token has a non nil value
 
 ```lua
---{assert(0, "LUA")}-- 
+--{assert(0, "LUA")}--
 if token.bars.Health == nil then
-  println("Healtbar not visible")
+println("Healtbar not visible")
 else
-  println("Healtbar visible")
+println("Healtbar visible")
 end
 ```
 
 #### Macro Functions isDialogVisible() and isFrameVisible()
 These functions are part of the UI library
 ```lua
---{assert(0, "LUA")}-- 
+--{assert(0, "LUA")}--
 println(UI.isDialogVisible("Name"))
 println(UI.isFrameVisible("Name"))
 ```
@@ -1910,11 +1910,11 @@ println(UI.isFrameVisible("Name"))
 There is no function is Lua for this, but the functions table holds all user defined functions. The table can be used to check for the existance
 
 ```lua
---{assert(0, "LUA")}-- 
+--{assert(0, "LUA")}--
 if functions.name ~= nil then -- function is defined
-  functions.name("parameter")
+functions.name("parameter")
 else
-  println("No user defined function \"name\" found")
+println("No user defined function \"name\" found")
 end
 ```
 

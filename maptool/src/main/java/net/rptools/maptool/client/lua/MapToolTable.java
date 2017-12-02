@@ -136,7 +136,7 @@ public class MapToolTable extends LuaTable implements IRepresent {
 	public LookupTable getTable() {
 		return table;
 	}
-	
+
 	@Override
 	public Object export() {
 		return table.getName();

@@ -15,15 +15,15 @@ import org.luaj.vm2.Varargs;
  *
  */
 public class InsertionOrderLuaTable extends LuaTable {
-	List<LuaValue> order = new ArrayList<LuaValue>(); 
+	List<LuaValue> order = new ArrayList<LuaValue>();
 
 	public void set(int key, LuaValue value) {
 		LuaValue k = valueOf(key);
 		if (!order.contains(k)) {
-			if (!value.isnil()) 
+			if (!value.isnil())
 				order.add(k);
 		} else {
-			if (value.isnil()) 
+			if (value.isnil())
 				order.remove(k);
 		}
 		super.set(key, value);
@@ -32,10 +32,10 @@ public class InsertionOrderLuaTable extends LuaTable {
 	public void rawset(int key, LuaValue value) {
 		LuaValue k = valueOf(key);
 		if (!order.contains(k)) {
-			if (!value.isnil()) 
+			if (!value.isnil())
 				order.add(k);
 		} else {
-			if (value.isnil()) 
+			if (value.isnil())
 				order.remove(k);
 		}
 		super.rawset(key, value);
@@ -44,15 +44,16 @@ public class InsertionOrderLuaTable extends LuaTable {
 	public void rawset(LuaValue key, LuaValue value) {
 		if (!key.isnil()) {
 			if (!order.contains(key)) {
-				if (!value.isnil()) 
+				if (!value.isnil())
 					order.add(key);
 			} else {
-				if (value.isnil()) 
+				if (value.isnil())
 					order.remove(key);
 			}
 		}
 		super.rawset(key, value);
 	}
+
 	@Override
 	public Varargs next(LuaValue key) {
 		int i = order.indexOf(key);

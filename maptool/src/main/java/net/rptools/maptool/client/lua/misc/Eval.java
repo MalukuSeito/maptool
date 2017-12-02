@@ -17,10 +17,12 @@ public class Eval extends VarArgFunction {
 
 	private MapToolVariableResolver resolver;
 	boolean newContext = false;
+
 	public Eval(MapToolVariableResolver resolver, boolean newContext) {
 		this.resolver = resolver;
 		this.newContext = newContext;
 	}
+
 	@Override
 	public Varargs invoke(Varargs args) {
 		MapToolVariableResolver macroResolver = resolver;
@@ -43,5 +45,5 @@ public class Eval extends VarArgFunction {
 		} catch (ParserException e) {
 			throw new LuaError(e);
 		}
-	}	
+	}
 }

@@ -153,7 +153,7 @@ public class getInfoFunction extends AbstractFunction {
 	 * 
 	 * @return the client side preferences
 	 */
-	public static  JSONObject getClientInfo() {
+	public static JSONObject getClientInfo() {
 		Map<String, Object> cinfo = new HashMap<String, Object>();
 
 		cinfo.put("face edge", AppPreferences.getFaceEdge() ? BigDecimal.ONE : BigDecimal.ZERO);
@@ -198,7 +198,7 @@ public class getInfoFunction extends AbstractFunction {
 	 * 
 	 * @return the server side preferences
 	 */
-	public static  JSONObject getServerInfo() {
+	public static JSONObject getServerInfo() {
 		Map<String, Object> sinfo = new HashMap<String, Object>();
 		ServerPolicy sp = MapTool.getServerPolicy();
 
@@ -231,7 +231,7 @@ public class getInfoFunction extends AbstractFunction {
 	 * @throws ParserException
 	 *             if an error occurs.
 	 */
-	public static  JSONObject getCampaignInfo() throws ParserException {
+	public static JSONObject getCampaignInfo() throws ParserException {
 		if (!MapTool.getParser().isMacroTrusted()) {
 			throw new ParserException(I18N.getText("macro.function.general.noPerm", "getInfo('campaign')"));
 		}

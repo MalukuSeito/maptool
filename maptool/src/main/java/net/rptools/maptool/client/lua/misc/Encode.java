@@ -13,7 +13,7 @@ public class Encode extends VarArgFunction {
 
 	@Override
 	public LuaValue invoke(Varargs args) {
-		LuaValue arg1 = args.arg(1); 
+		LuaValue arg1 = args.arg(1);
 		LuaValue arg2 = args.arg(2);
 		List<String> vals = new ArrayList<String>();
 		for (int i = 3; !args.arg(i).isnil(); i++) {

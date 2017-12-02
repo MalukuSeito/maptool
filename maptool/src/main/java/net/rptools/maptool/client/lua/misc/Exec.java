@@ -20,12 +20,14 @@ public class Exec extends VarArgFunction {
 	boolean newContext = false;
 	boolean trusted = true;
 	boolean convertToArray;
+
 	public Exec(MapToolVariableResolver resolver, boolean newContext, boolean trusted, boolean convertToArray) {
 		this.resolver = resolver;
 		this.newContext = newContext;
 		this.trusted = trusted;
 		this.convertToArray = convertToArray;
 	}
+
 	@Override
 	public Varargs invoke(Varargs args) {
 		seen.clear();
@@ -68,7 +70,7 @@ public class Exec extends VarArgFunction {
 			seen.put(input, v);
 			return v;
 		}
-		
+
 	}
-	
+
 }

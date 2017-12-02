@@ -118,9 +118,9 @@ public class VisibleAreaSegment implements Comparable<VisibleAreaSegment> {
 	public int compareTo(VisibleAreaSegment o) {
 		if (o != this) {
 			return Double.compare(getDistanceFromOrigin(), o.getDistanceFromOrigin());
-//			double odist = o.getDistanceFromOrigin();
-//			double val = getDistanceFromOrigin() - odist; // separate variable for debugging
-//			return (int) val;
+			//			double odist = o.getDistanceFromOrigin();
+			//			double val = getDistanceFromOrigin() - odist; // separate variable for debugging
+			//			return (int) val;
 			// Jamz: We're getting the following exception from this compare: java.lang.IllegalArgumentException: Comparison method violates its general contract!
 			// So we changed getDistanceFromOrigin() to return a long after multiplying by 1000 for precision
 			//long odist = o.getDistanceFromOrigin();

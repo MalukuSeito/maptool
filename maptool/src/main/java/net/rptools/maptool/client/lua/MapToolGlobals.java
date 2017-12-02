@@ -45,15 +45,15 @@ public class MapToolGlobals extends Globals {
 	MapToolVariableResolver resolver;
 	private LuaValue m_campaignProps = null;
 
-//	private class CompilerUndumper implements Undumper {
-//		@Override
-//		public Prototype undump(InputStream stream, String chunkname)
-//				throws IOException {
-//			return compiler.compile(stream, chunkname);
-//		}
-//		
-//	}
-	
+	//	private class CompilerUndumper implements Undumper {
+	//		@Override
+	//		public Prototype undump(InputStream stream, String chunkname)
+	//				throws IOException {
+	//			return compiler.compile(stream, chunkname);
+	//		}
+	//		
+	//	}
+
 	private class SimpleLoader implements Loader {
 
 		@Override
@@ -61,7 +61,7 @@ public class MapToolGlobals extends Globals {
 			return new LuaClosure(prototype, env);
 		}
 	}
-	
+
 	/**
 	 * @param res 
 	 * 
@@ -190,7 +190,7 @@ public class MapToolGlobals extends Globals {
 
 		return new ReadOnlyLuaTable(campaign);
 	}
-	
+
 	private LuaTable formatProp(TokenProperty p, boolean trusted) {
 		LuaTable o = new LuaTable();
 		o.rawset("name", valOf(p.getName()));
@@ -223,12 +223,12 @@ public class MapToolGlobals extends Globals {
 		if (over instanceof ImageTokenOverlay) {
 			StringBuilder assetId = new StringBuilder("asset://");
 			assetId.append(((ImageTokenOverlay) over).getAssetId().toString());
-//			if (size != null) {
-//				assetId.append("-");
-//				// Constrain it slightly, so its between 1 and 500 :)
-//				int i = Math.max(Math.min(size.intValue(), 500), 1);
-//				assetId.append(i);
-//			}
+			//			if (size != null) {
+			//				assetId.append("-");
+			//				// Constrain it slightly, so its between 1 and 500 :)
+			//				int i = Math.max(Math.min(size.intValue(), 500), 1);
+			//				assetId.append(i);
+			//			}
 			o.rawset("image", assetId.toString());
 		}
 		return o;

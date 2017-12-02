@@ -30,6 +30,7 @@ public class MapToolFunction extends VarArgFunction {
 	private String function;
 	private MapToolVariableResolver resolver;
 	private boolean convertToArray;
+
 	public MapToolFunction(String function, MapToolVariableResolver resolver, boolean convertToArray) {
 		this.function = function;
 		this.resolver = resolver;
@@ -44,7 +45,7 @@ public class MapToolFunction extends VarArgFunction {
 		}
 		return NONE;
 	}
-	
+
 	public static Varargs runMacro(MapToolVariableResolver resolver,
 			Token tokenInContext, String macro, boolean ignoreOutput, boolean newVariableContext, Varargs args, boolean stripComments, boolean convertToArray) {
 		try {
@@ -129,7 +130,7 @@ public class MapToolFunction extends VarArgFunction {
 			} else {
 				macroResolver = resolver;
 			}
-			
+
 			Varargs res = Macro.runMacro(macroResolver, tokenInContext, macroContext, macroBody, args, convertToArray);
 			String output = res.arg(2).toString();
 			if (ignoreOutput) {
@@ -140,14 +141,14 @@ public class MapToolFunction extends VarArgFunction {
 				return varargsOf(res.arg(1), valueOf(stripOutput), res.arg(3));
 			}
 			return varargsOf(res.arg(1), valueOf(output), res.arg(3));
-			
+
 		} catch (ParserException e) {
 			throw new LuaError(e);
 		}
 	}
 
 	public String tojstring() {
-		return "User defined function "+ function;
+		return "User defined function " + function;
 	}
 
 	@Override
@@ -164,6 +165,5 @@ public class MapToolFunction extends VarArgFunction {
 	public String toString() {
 		return tojstring();
 	}
-	
-	
+
 }

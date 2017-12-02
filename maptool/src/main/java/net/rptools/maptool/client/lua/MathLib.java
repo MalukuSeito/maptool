@@ -18,6 +18,10 @@ public class MathLib extends JseMathLib {
 		math.set("hypot", new hypot());
 		return math;
 	}
-	
-	static final class hypot extends BinaryOp { protected double call(double d, double o) { return Math.hypot(d, o); } }
+
+	static final class hypot extends BinaryOp {
+		protected double call(double d, double o) {
+			return Math.hypot(d, o);
+		}
+	}
 }

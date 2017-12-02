@@ -27,7 +27,7 @@ public class UILib extends TwoArgFunction {
 		HTMLFrameFactory.close(false, arg.checkjstring());
 		return NIL;
 	}
-	
+
 	public static LuaValue closeFrame(LuaValue arg) {
 		HTMLFrameFactory.close(true, arg.checkjstring());
 		return NIL;
@@ -55,7 +55,7 @@ public class UILib extends TwoArgFunction {
 		HTMLFrame.center(arg.checkjstring());
 		return NIL;
 	}
-	
+
 	public static final class UI1 extends OneArgFunction {
 		public LuaValue call(LuaValue arg) {
 			switch (opcode) {
@@ -73,7 +73,7 @@ public class UILib extends TwoArgFunction {
 			return NIL;
 		}
 	}
-	
+
 	public static final class UI3 extends ThreeArgFunction {
 		public LuaValue call(LuaValue arg, LuaValue arg2, LuaValue arg3) {
 			switch (opcode) {
@@ -97,8 +97,6 @@ public class UILib extends TwoArgFunction {
 		env.get("package").get("loaded").set("UI", t);
 		return t;
 	}
-
-	
 
 	public static void checkTrusted(String cls) {
 		if (!MapTool.getParser().isMacroTrusted()) {

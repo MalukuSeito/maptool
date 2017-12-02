@@ -93,7 +93,7 @@ public class MapToolToken extends LuaTable implements IRepresent {
 	private static final String NPC = "npc";
 	private static final String TYPE = "type";
 	private static final String MACROS = "macros";
-	
+
 	//	private static final String DRAW_ORDER2 = "z";
 	//	private static final String X = "x";
 	//	private static final String Y = "y";
@@ -697,8 +697,8 @@ public class MapToolToken extends LuaTable implements IRepresent {
 				return new SetOwner(this);
 			case F_IS_OWNER:
 				return new IsOwner(this);
-//			case F_IS_OWNED_BY_ALL:
-//				return new IsOwnedByAll(this);
+			//			case F_IS_OWNED_BY_ALL:
+			//				return new IsOwnedByAll(this);
 			case F_IMAGE:
 				return new ImageFunc(this, imageType.TOKEN_IMAGE);
 			case F_PORTRAIT:
@@ -774,12 +774,10 @@ public class MapToolToken extends LuaTable implements IRepresent {
 	public boolean isSelfOrTrusted() {
 		return isSelf || MapTool.getParser().isMacroTrusted();
 	}
-	
+
 	public boolean isSelfOrTrustedOrLib() {
 		return isSelf || isLib() || MapTool.getParser().isMacroTrusted();
 	}
-	
-	
 
 	public boolean isLib() {
 		if (token != null) {

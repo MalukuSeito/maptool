@@ -68,7 +68,8 @@ public class MapToolMacro extends LuaTable {
 	}
 
 	private LuaValue valOf(String text) {
-		if (text == null) return null;
+		if (text == null)
+			return null;
 		return valueOf(text);
 	}
 

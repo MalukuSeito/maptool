@@ -21,6 +21,7 @@ public class MacroCall extends VarArgFunction {
 		this.globals = globals;
 		this.convertToArray = convertToArray;
 	}
+
 	@Override
 	public Varargs invoke(Varargs args) {
 		String macro = args.checkjstring(1);

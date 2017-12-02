@@ -15,13 +15,14 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 public class MovedOverPoints extends TwoArgFunction {
-	
+
 	MapToolToken token;
-	
+
 	public MovedOverPoints(MapToolToken token) {
 		super();
 		this.token = token;
 	}
+
 	@Override
 	public LuaValue call(LuaValue pnts, LuaValue p) {
 		Zone zone = MapTool.getFrame().getCurrentZoneRenderer().getZone();

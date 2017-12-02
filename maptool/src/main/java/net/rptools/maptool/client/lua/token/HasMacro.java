@@ -9,10 +9,11 @@ import org.luaj.vm2.lib.OneArgFunction;
 
 public class HasMacro extends OneArgFunction {
 	private MapToolToken token;
+
 	public HasMacro(MapToolToken token) {
 		this.token = token;
 	}
-	
+
 	@Override
 	public LuaValue call(LuaValue arg) {
 		if (!token.isSelfOrTrusted()) {

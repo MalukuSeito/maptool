@@ -23,17 +23,17 @@ public class Expose extends ZeroArgFunction {
 	public LuaValue call() {
 		ZoneRenderer zr = findRenderer(map);
 		if (onlySelected) {
-			
+
 			FogUtil.exposeVisibleArea(zr, getTokenSelectedSet(zr));
 		} else {
 			FogUtil.exposePCArea(zr);
 		}
 		return NONE;
-		
+
 	}
-	
+
 	private ZoneRenderer findRenderer(MapToolMap map) {
-		if(MapTool.getFrame().getCurrentZoneRenderer().getZone().getId().equals(map.getZone().getId())) {
+		if (MapTool.getFrame().getCurrentZoneRenderer().getZone().getId().equals(map.getZone().getId())) {
 			return MapTool.getFrame().getCurrentZoneRenderer();
 		}
 		for (ZoneRenderer zr : MapTool.getFrame().getZoneRenderers()) {

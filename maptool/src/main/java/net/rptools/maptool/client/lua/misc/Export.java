@@ -18,9 +18,11 @@ import org.luaj.vm2.lib.TwoArgFunction;
  */
 public class Export extends TwoArgFunction {
 	private final MapToolVariableResolver resolver;
+
 	public Export(MapToolVariableResolver resolver) {
 		this.resolver = resolver;
 	}
+
 	@Override
 	public LuaValue call(LuaValue name, LuaValue value) {
 		Object v = LuaConverters.toJson(value).toString();

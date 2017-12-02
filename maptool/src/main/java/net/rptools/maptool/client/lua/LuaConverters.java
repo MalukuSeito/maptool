@@ -66,6 +66,7 @@ public class LuaConverters {
 	}
 	private static final String keyValuePatt = "\\s*([\\w .]+)\\s*=\\s*(.*)";
 	private static final Pattern keyValueParser = Pattern.compile(keyValuePatt);
+
 	//fromObj
 	//toJSON
 	//fromJSON
@@ -307,7 +308,7 @@ public class LuaConverters {
 	public static String toStr(LuaValue val, String listSep, String propSep) {
 		return toStr(val, Collections.newSetFromMap(new IdentityHashMap<LuaValue, Boolean>()), listSep, propSep);
 	}
-	
+
 	private static String toStr(LuaValue val, Set<LuaValue> seen, String listSep, String propSep) {
 		if (val instanceof IRepresent) {
 			return ObjectUtils.toString(((IRepresent) val).export());
@@ -329,7 +330,7 @@ public class LuaConverters {
 					isArray = false;
 				}
 				String result = toStr(value, seen, listSep, propSep);
-				
+
 				if (isArray) {
 					array.add(result);
 				}
@@ -350,7 +351,7 @@ public class LuaConverters {
 				return StringUtils.join(array, listSep);
 			} else {
 				array.clear();
-				for (Entry<String, String> e: map.entrySet()) {
+				for (Entry<String, String> e : map.entrySet()) {
 					String result = e.getValue();
 					if (!unsafeSep(propSep) && (result.contains(propSep) || result.contains("%"))) {
 						result = encode(result, true, propSep);
@@ -368,7 +369,7 @@ public class LuaConverters {
 		}
 		return val.tojstring();
 	}
-	
+
 	public static Map<String, String> parse(String props, String delim) {
 		Map<String, String> map = new LinkedHashMap<String, String>();
 		String delimPatt;
@@ -410,16 +411,14 @@ public class LuaConverters {
 		}
 		return map;
 	}
-	
-	
-	
+
 	public static LuaValue fromStr(String val, String listSep, String propSep, boolean forceList, boolean forceProps) {
 		String str = val;
 		if (forceProps || (!forceList && (str.contains("=") || str.contains(propSep) || str.matches("[^=]+\\.[0-9A-F]{2}.+")))) {
 			LuaTable result = new InsertionOrderLuaTable();
 			Map<String, String> parse = parse(str, propSep);
 			if (!parse.isEmpty()) {
-				for (Entry<String, String> e: parse.entrySet()) {
+				for (Entry<String, String> e : parse.entrySet()) {
 					String key = e.getKey();
 					if (key.matches("[^=]+[0-9A-F]{2}.+")) {
 						try {
@@ -431,15 +430,15 @@ public class LuaConverters {
 				}
 				return result;
 			}
-		} 
+		}
 		if (forceList || str.contains(listSep)) {
 			LuaTable result = new LuaTable();
-			for (String e: StringUtils.splitByWholeSeparator(str, listSep)) {
+			for (String e : StringUtils.splitByWholeSeparator(str, listSep)) {
 				result.insert(0, fromStr(trydecode(e.trim()), listSep, propSep, false, false));
 			}
 			return result;
 		}
-		str=trydecode(str);
+		str = trydecode(str);
 		try {
 			return LuaValue.valueOf(Integer.parseInt(str));
 		} catch (NumberFormatException e) {
@@ -450,7 +449,7 @@ public class LuaConverters {
 		}
 		return LuaValue.valueOf(str);
 	}
-	
+
 	private static String trydecode(String str) {
 		if (str.contains("%")) {
 			try {
@@ -465,25 +464,44 @@ public class LuaConverters {
 		if (sep == null) {
 			return true;
 		}
-		if (sep.matches("^[0-9A-F]{2}$")) return true;
-		if (sep.matches("^%[0-9A-F]{2}$")) return true;
-		if (sep.equals("%")) return true;
-		if (sep.equals("0")) return true;
-		if (sep.equals("1")) return true;
-		if (sep.equals("2")) return true;
-		if (sep.equals("3")) return true;
-		if (sep.equals("4")) return true;
-		if (sep.equals("5")) return true;
-		if (sep.equals("6")) return true;
-		if (sep.equals("7")) return true;
-		if (sep.equals("8")) return true;
-		if (sep.equals("9")) return true;
-		if (sep.equals("A")) return true;
-		if (sep.equals("B")) return true;
-		if (sep.equals("C")) return true;
-		if (sep.equals("D")) return true;
-		if (sep.equals("E")) return true;
-		if (sep.equals("F")) return true;
+		if (sep.matches("^[0-9A-F]{2}$"))
+			return true;
+		if (sep.matches("^%[0-9A-F]{2}$"))
+			return true;
+		if (sep.equals("%"))
+			return true;
+		if (sep.equals("0"))
+			return true;
+		if (sep.equals("1"))
+			return true;
+		if (sep.equals("2"))
+			return true;
+		if (sep.equals("3"))
+			return true;
+		if (sep.equals("4"))
+			return true;
+		if (sep.equals("5"))
+			return true;
+		if (sep.equals("6"))
+			return true;
+		if (sep.equals("7"))
+			return true;
+		if (sep.equals("8"))
+			return true;
+		if (sep.equals("9"))
+			return true;
+		if (sep.equals("A"))
+			return true;
+		if (sep.equals("B"))
+			return true;
+		if (sep.equals("C"))
+			return true;
+		if (sep.equals("D"))
+			return true;
+		if (sep.equals("E"))
+			return true;
+		if (sep.equals("F"))
+			return true;
 		return false;
 	}
 
@@ -497,16 +515,16 @@ public class LuaConverters {
 		} catch (UnsupportedEncodingException e) {
 			throw new LuaError(e);
 		}
-		for (String bad: additionalEncodes) {
-			for (byte b: bad.getBytes()) {
+		for (String bad : additionalEncodes) {
+			for (byte b : bad.getBytes()) {
 				if (dontNeedEncoding.get(b)) {
-					encoded.replace(""+Character.valueOf((char) b), "%"+Integer.toHexString(b).toUpperCase());
+					encoded.replace("" + Character.valueOf((char) b), "%" + Integer.toHexString(b).toUpperCase());
 				}
 			}
 		}
 		return encoded;
 	}
-	
+
 	public static String decode(String str, boolean replaceSemi) {
 		String decoded = str;
 		try {
@@ -519,7 +537,7 @@ public class LuaConverters {
 		}
 		return decoded;
 	}
-	
+
 	public static Iterable<LuaValue> iterate(final LuaTable table) {
 		return new Iterable<LuaValue>() {
 			@Override

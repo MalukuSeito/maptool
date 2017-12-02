@@ -59,16 +59,19 @@ public class UserDefinedMacroFunctions implements Function {
 		String macroName;
 		boolean ignoreOutput;
 		boolean newVariableContext;
+
 		public String getMacroName() {
 			return macroName;
 		}
+
 		public boolean isIgnoreOutput() {
 			return ignoreOutput;
 		}
+
 		public boolean isNewVariableContext() {
 			return newVariableContext;
 		}
-		
+
 	}
 
 	private static class FunctionRedefinition {
@@ -250,6 +253,5 @@ public class UserDefinedMacroFunctions implements Function {
 	public Map<String, FunctionDefinition> getUserDefinedFunctions() {
 		return userDefinedFunctions;
 	}
-	
-	
+
 }

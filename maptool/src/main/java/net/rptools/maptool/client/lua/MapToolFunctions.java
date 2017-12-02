@@ -20,6 +20,7 @@ import org.luaj.vm2.Varargs;
 public class MapToolFunctions extends LuaTable {
 	private MapToolVariableResolver resolver;
 	private boolean convertToArray;
+
 	public MapToolFunctions(MapToolVariableResolver resolver, boolean convertToArray) {
 		this.resolver = resolver;
 		this.convertToArray = convertToArray;
@@ -86,7 +87,7 @@ public class MapToolFunctions extends LuaTable {
 		} else {
 			name = key.checkjstring();
 		}
-		for (String s: UserDefinedMacroFunctions.getInstance().getUserDefinedFunctions().keySet()) {
+		for (String s : UserDefinedMacroFunctions.getInstance().getUserDefinedFunctions().keySet()) {
 			if (s == null) {
 				continue;
 			}

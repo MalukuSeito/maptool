@@ -53,6 +53,7 @@ public class MapToolBaseLib extends BaseLib {
 			throw new LuaError(e);
 		}
 	}
+
 	public InputStream find(String lua) {
 		String macro = lua;
 		if (macro.endsWith(".lua")) {
@@ -61,7 +62,7 @@ public class MapToolBaseLib extends BaseLib {
 		try {
 			String[] macroParts = macro.split("@", 2);
 			String macroLocation;
-	
+
 			String macroName = macroParts[0];
 			if (macroParts.length == 1) {
 				macroLocation = null;
@@ -71,7 +72,7 @@ public class MapToolBaseLib extends BaseLib {
 			// For convenience to macro authors, no error on a blank macro name
 			if (macroName.equalsIgnoreCase(""))
 				throw new LuaError("Can't import empty string");
-	
+
 			// IF the macro is a  @this, then we get the location of the current macro and use that.
 			if (macroLocation != null && macroLocation.equalsIgnoreCase("this")) {
 				macroLocation = MapTool.getParser().getMacroSource();
@@ -123,7 +124,7 @@ public class MapToolBaseLib extends BaseLib {
 			} else { // Search for a token called macroLocation (must start with "Lib:")
 				String macroBody = MapTool.getParser().getTokenLibMacro(macroName, macroLocation);
 				Token token = MapTool.getParser().getTokenMacroLib(macroLocation);
-	
+
 				if (macroBody == null || token == null) {
 					throw new ParserException(I18N.getText("lineParser.unknownMacro", macroName));
 				}
@@ -134,7 +135,7 @@ public class MapToolBaseLib extends BaseLib {
 			throw new LuaError(e);
 		} catch (Exception e) {
 			throw e;
-		}		
+		}
 	}
 
 	private void checkContext(boolean secure, String macro) {

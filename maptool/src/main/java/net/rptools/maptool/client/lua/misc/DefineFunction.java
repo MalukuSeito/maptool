@@ -19,7 +19,8 @@ public class DefineFunction extends VarArgFunction {
 	@Override
 	public Varargs invoke(Varargs args) {
 		try {
-			UserDefinedMacroFunctions.getInstance().defineFunction(MapTool.getParser().createParser(resolver, resolver.getTokenInContext() != null).getParser(), args.arg1().checkjstring(), args.arg(2).checkjstring(), args.arg(3).isboolean() ? args.arg(3).toboolean() : false, args.arg(4).isboolean() ? args.arg(4).toboolean() : false);
+			UserDefinedMacroFunctions.getInstance().defineFunction(MapTool.getParser().createParser(resolver, resolver.getTokenInContext() != null).getParser(), args.arg1().checkjstring(),
+					args.arg(2).checkjstring(), args.arg(3).isboolean() ? args.arg(3).toboolean() : false, args.arg(4).isboolean() ? args.arg(4).toboolean() : false);
 			return NONE;
 		} catch (ParserException e) {
 			throw new LuaError(e);

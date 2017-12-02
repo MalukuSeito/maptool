@@ -362,7 +362,7 @@ public class InputFunction extends AbstractFunction {
 			if (inputType != null && inputType.isValueComposite)
 				this.valueList = parseStringList(this.value);
 		}
-		
+
 		public VarSpec(InputType inputType, String name, String value, String prompt, OptionMap options) {
 			this.name = name;
 			this.value = value;
@@ -372,10 +372,10 @@ public class InputFunction extends AbstractFunction {
 			if (inputType != null && inputType.isValueComposite)
 				this.valueList = parseStringList(this.value);
 		}
-		
+
 		public VarSpec(InputType inputType, String name, List<String> values, String prompt, OptionMap options, List<Object> objectlist) {
 			this.name = name;
-			this.value = StringUtils.join(values,",");
+			this.value = StringUtils.join(values, ",");
 			this.valueList = values;
 			this.prompt = prompt;
 			this.inputType = inputType;
@@ -1027,7 +1027,6 @@ public class InputFunction extends AbstractFunction {
 
 	}
 
-	
 	public static List<VarSpec> createVarSpecs(List<Object> parameters) throws EvaluationException, ParserException {
 		List<String> varStrings = new ArrayList<String>();
 		for (Object param : parameters) {
@@ -1061,7 +1060,7 @@ public class InputFunction extends AbstractFunction {
 		}
 		return varSpecs;
 	}
-	
+
 	public static String createTitle(Token tokenInContext) {
 		String dialogTitle = "Input Values";
 		if (tokenInContext != null) {
@@ -1078,13 +1077,13 @@ public class InputFunction extends AbstractFunction {
 		}
 		return dialogTitle;
 	}
-	
+
 	// The function that does all the work
 	@Override
 	public Object childEvaluate(Parser parser, String functionName, List<Object> parameters) throws EvaluationException, ParserException {
 		// Extract the list of specifier strings from the parameters
 		// "name | value | prompt | inputType | options"
-		
+
 		List<VarSpec> varSpecs = createVarSpecs(parameters);
 		// Check if any variables were defined
 		if (varSpecs.isEmpty())
@@ -1096,7 +1095,6 @@ public class InputFunction extends AbstractFunction {
 		if (varRes instanceof MapToolVariableResolver) {
 			tokenInContext = ((MapToolVariableResolver) varRes).getTokenInContext();
 		}
-		
 
 		// UI step 2 - build the panel with the input fields
 		InputPanel ip = new InputPanel(varSpecs);
