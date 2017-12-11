@@ -188,7 +188,7 @@ public class LuaConverters {
 	}
 
 	private static LuaTable fromJson(JSONObject obj, Set<Object> seen) {
-		LuaTable result = new LuaTable();
+		LuaTable result = new InsertionOrderLuaTable();
 		for (Object keyObj : obj.keySet()) {
 			String key = StringUtils.defaultString(ObjectUtils.toString(keyObj));
 			Object val = obj.get(keyObj);
@@ -279,6 +279,8 @@ public class LuaConverters {
 			JSONObject res = new JSONObject();
 			res.putAll(map);
 			return res;
+		} else if (val.isstring()) {
+			return val.tojstring();
 		} else if (val.isnumber()) {
 			if (val.isint()) {
 				return BigDecimal.valueOf(val.checkint());
@@ -288,9 +290,7 @@ public class LuaConverters {
 			} catch (NumberFormatException nfe) {
 				return "";
 			}
-		} else if (val.isstring()) {
-			return val.tojstring();
-		} else if (val.isnil()) {
+		}  else if (val.isnil()) {
 			return "";
 		} else if (val.isboolean()) {
 			return val.checkboolean();

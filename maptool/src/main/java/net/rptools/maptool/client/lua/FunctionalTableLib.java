@@ -37,6 +37,7 @@ public class FunctionalTableLib extends TableLib {
 		table.set("difference", new difference());
 		table.set("intersection", new intersection());
 		table.set("merge", new merge());
+		table.set("ordered", new ordered());
 		return result;
 	}
 
@@ -110,6 +111,20 @@ public class FunctionalTableLib extends TableLib {
 			while (!next.isnil(1)) {
 				result.insert(0, next.arg(2));
 				next = l.next(next.arg1());
+			}
+			return result;
+		}
+	}
+	
+	static class ordered extends TableLibFunction {
+		public LuaValue call(LuaValue table) {
+			LuaTable result = new InsertionOrderLuaTable();
+			if (table.istable()) {
+				Varargs next = table.next(LuaValue.NIL);
+				while (!next.isnil(1)) {
+					result.rawset(next.arg1(), next.arg(2));
+					next = table.next(next.arg1());
+				}
 			}
 			return result;
 		}
