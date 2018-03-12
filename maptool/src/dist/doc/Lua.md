@@ -2001,6 +2001,145 @@ This function can be called on any token
 println(token.isVisible(10, 0))
 ```
 
-### Roll-Options
+#### Macro Function json.append()
+The default LUA table library has an insert function, which can be used to append to a LUA table, when given no positional parameter.
 
+```lua
+--{assert(0, "LUA")}--
+a = fromStr("a,1,g,4")
+table.insert(a, 55) -- table.insert(a, 1, 55) to insert at front
+println(toJSON(a))
+```
+
+#### Macro Function json.contains()
+The table library has been extended to include this functionality, table.contains works only on the continous array part of a luatable, while containsValue works in any case
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+println(table.contains(a, "b"), " ", table.contains(a, "d"))
+```
+
+```lua
+--{assert(0, "LUA")}--
+a = {h="a", i="b", j="c"}
+println(table.containsValue(a, "b"), " ", table.contains(a, "d"))
+```
+
+
+#### Macro Function json.count()
+The table library has been extended to include this functionality. If no elements are found, 0 is returned.
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c", "b"}
+println(table.count(a, "b"), " ", table.count(a, "d"))
+```
+
+```lua
+--{assert(0, "LUA")}--
+a = {h="a", i="b", j="b"}
+println(table.count(a, "b"), " ", table.count(a, "d"))
+```
+
+#### Macro Function json.difference()
+This functionality has been added to the table library. If the first tables is  a list, the values are used, otherwise the keys are used
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+c = {"a", "c", "e"}
+println(toJSON(table.difference(a, c)))
+println(toJSON(table.difference(c, a)))
+```
+
+#### Macro Function json.equals()
+This functionality has been added to the table library.
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+c = {"a", "c", "b"}
+println(table.equals(a, c))
+table.sort(c)
+println(table.equals(a, c))
+```
+
+#### Macro Function json.evaluate()
+The eval.../exec... functions of the macro library also accept tables, however the output is in the second table it returns, the first table contains the values set to macro.return by the evaluated code.
+```lua
+--{assert(0, "LUA")}--
+a = {"[r:Value]", "[r:macro.return=Value2]", "c"}
+res, evaled = macro.eval(a)
+println(toJSON(a), "=>", toJSON(evaled), "/" , toJSON(res))
+```
+
+#### Macro Function json.fields()
+This function has been added as keys() to the table library.
+
+```lua
+--{assert(0, "LUA")}--
+a = {a=2, b=3, c=7}
+println(toJSON(table.keys(a)))
+```
+
+However, usually the macro function was used for iteration, which can be done in LUA without it.
+```lua
+--{assert(0, "LUA")}--
+jsonvalue = "{a:1, b:2, c:3}"
+for key, value in pairs(fromJSON(jsonvalue)) do
+  -- Do sth with key and/or value like:
+  println(key, " is ", value)
+end
+```
+
+#### Macro function json.fromList() and fromStrProp()
+There is no direct conversion from strlist to JSON, but conversion functions to and from LUA objects exists (toStr(), fromStr(), toJSON(), fromJSON()), which can be used instead. Mostly you would want to work with LUA objects instead for ease of use and performance.
+```lua
+--{assert(0, "LUA")}--
+println(toJSON(fromStr("a,1,g,4")))
+println(toJSON(fromStr("a,1,g,4", ","))) -- "," is the delimiter, forcing list
+println(toJSON(fromStr("a=1;b=44;c=12")))
+println(toJSON(fromStr("a=1,b=44,c=12", nil, ","))) -- "," is the delimiter for the prop now, forcing a table
+println(toJSON(fromStr("a=1,b=44,c=12", ","))) -- "," forcing a list and making it a table of tables, [{"a":"1"},{"b":"44"},{"c":"12"}] 
+```
+
+#### Macro function json.get()
+This is done with the brackets or dot operators in lua, the datastructure must be converted to lua objects using fromJSON(). Careful, lua arrays count from 1
+
+```lua
+--{assert(0, "LUA")}--
+val = fromJSON("{a:1,b:44,c:12}")
+println(val.a)
+println(val["b"])
+key = "c";
+println(val[key]) --indirect access
+
+val2 = fromJSON("[\"aa\",\"bb\",\"cc\"]")
+println(val2[2]) -- array access
+index = 3
+println(val2[index]) --indirect access
+```
+
+#### Macro function json.indent() 
+This function has been moved into the tables library and works on both JSON strings and LUA objects
+
+```lua
+--{assert(0, "LUA")}--
+val = fromJSON("{a:1,b:44,c:12}")
+val.d="Text";
+println("<pre>", table.indent(val), "</pre>")
+println("<pre>", table.indent("{a:1,b:44,c:12}", 1), "</pre>")
+```
+
+#### Macro function json.indexOf()
+This function has been moved into the table library. However, since LUA starts counting lists at 1 instead of 0, this function will return the LUA index (or 0 if no element is found)
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+println(table.indexOf(a, "b"), " ", table.indexOf(a, "d"))
+```
+
+
+### Roll-Options
 

@@ -624,17 +624,17 @@ public class MapToolToken extends LuaTable implements IRepresent {
 				}
 				return valOf(token.getFacing());
 			case IMAGE:
-				if ((isSelf || !MapTool.getParser().isMacroTrusted() || visibleToMe()) && token != null && token.getImageAssetId() != null) {
+				if ((isSelf || MapTool.getParser().isMacroTrusted() || visibleToMe()) && token != null && token.getImageAssetId() != null) {
 					return valOf("asset://" + token.getImageAssetId());
 				}
 				return valOf("");
 			case PORTRAIT:
-				if ((isSelf || !MapTool.getParser().isMacroTrusted()) && token != null && token.getPortraitImage() != null) {
+				if ((isSelf || MapTool.getParser().isMacroTrusted()) && token != null && token.getPortraitImage() != null) {
 					return valOf("asset://" + token.getPortraitImage());
 				}
 				return valOf("");
 			case HANDOUT:
-				if ((isSelf || !MapTool.getParser().isMacroTrusted()) && token != null && token.getCharsheetImage() != null) {
+				if ((isSelf || MapTool.getParser().isMacroTrusted()) && token != null && token.getCharsheetImage() != null) {
 					return valOf("asset://" + token.getCharsheetImage());
 				}
 				return valOf("");

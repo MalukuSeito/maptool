@@ -429,6 +429,8 @@ public class LuaConverters {
 					result.set(key, fromStr(trydecode(e.getValue()), listSep, propSep, forceList, false));
 				}
 				return result;
+			} else if (forceProps) {
+				return result;
 			}
 		}
 		if (forceList || str.contains(listSep)) {

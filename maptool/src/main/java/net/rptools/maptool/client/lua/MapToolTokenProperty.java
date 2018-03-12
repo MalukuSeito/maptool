@@ -73,6 +73,7 @@ public class MapToolTokenProperty extends LuaTable {
 						z = MapTool.getParser().getTokenMacroLibZone(token.getToken().getName());
 						MapTool.serverCommand().putToken(z.getId(), token.getToken());
 						z.putToken(token.getToken());
+						return;
 					} catch (ParserException e) {
 						throw new LuaError(e);
 					}

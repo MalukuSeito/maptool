@@ -1,6 +1,7 @@
 package net.rptools.maptool.client.lua;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,8 +30,10 @@ public class FunctionalTableLib extends TableLib {
 		table.set("length", new length());
 		table.set("indent", new indent());
 		table.set("contains", new contains());
+		table.set("indexOf", new indexof());
 		table.set("containsKey", new contains());
 		table.set("containsValue", new contains());
+		table.set("count", new count());
 		table.set("keys", new keys());
 		table.set("values", new values());
 		table.set("union", new union());
@@ -38,6 +41,8 @@ public class FunctionalTableLib extends TableLib {
 		table.set("intersection", new intersection());
 		table.set("merge", new merge());
 		table.set("ordered", new ordered());
+		table.set("shuffle", new shuffle());
+		table.set("equals", new equals());
 		return result;
 	}
 
@@ -59,6 +64,42 @@ public class FunctionalTableLib extends TableLib {
 				result.insert(0, func.call(val));
 			}
 			return result;
+		}
+	}
+	
+	static class equals extends TableLibFunction {
+		public LuaValue call(LuaValue list) {
+			return valueOf(list.isnil());
+		}
+		
+		public LuaValue call(LuaValue list, LuaValue list2) {
+			return compare(list, list2, new HashSet<LuaValue>());
+		}
+		
+		private LuaValue compare(LuaValue list, LuaValue list2, Set<LuaValue> seen) {
+		
+			if (list.istable() && list2.istable()) {
+				LuaTable table1 = list.checktable();
+				LuaTable table2 = list2.checktable();
+				if (table1.eq_b(table2)) {
+					return TRUE;
+				} else if (seen.contains(table1)) {
+					return FALSE;
+				}
+				Set<LuaValue> s = new HashSet<LuaValue>(seen);
+				s.add(table1);
+				ArrayList<LuaValue> keys = new ArrayList<>();
+				for (Varargs v = table1.next(NIL); !v.arg1().isnil(); v = table1.next(v.arg1())) {
+					LuaValue v2 = table2.get(v.arg1());
+					if (!TRUE.equals(compare(v.arg(2), v2, s))) return FALSE;
+					keys.add(v.arg1());
+				}
+				for (Varargs v = table2.next(NIL); !v.arg1().isnil(); v = table2.next(v.arg1())) {
+					if (!keys.contains(v.arg1())) return FALSE;
+				}
+				return TRUE;
+			}
+			return list.eq(list2);
 		}
 	}
 
@@ -152,6 +193,24 @@ public class FunctionalTableLib extends TableLib {
 		}
 	}
 
+	static class shuffle extends TableLibFunction {
+		public LuaValue call(LuaValue list) {
+			if (list.istable()) {
+				LuaTable table = list.checktable();
+				ArrayList<LuaValue> l = new ArrayList<LuaValue>(table.length());
+				for (LuaValue v: LuaConverters.arrayIterate(table)) {
+					l.add(v);
+				}
+				Collections.shuffle(l);
+				int i = 0;
+				for (LuaValue v: l) {
+					table.rawset(++i, v);
+				}
+			}
+			return list;
+		}
+	}
+	
 	static class contains extends TableLibFunction {
 		public LuaValue call(LuaValue list) {
 			return argerror(2, "value expected, got no value");
@@ -167,6 +226,45 @@ public class FunctionalTableLib extends TableLib {
 				next = l.next(next.arg1());
 			}
 			return FALSE;
+		}
+	}
+	
+	static class indexof extends TableLibFunction {
+		public LuaValue call(LuaValue list) {
+			return argerror(2, "value expected, got no value");
+		}
+
+		public LuaValue call(LuaValue list, LuaValue val) {
+			LuaTable l = list.checktable();
+			Varargs next = l.inext(LuaValue.ZERO);
+			int c = 0;
+			while (!next.isnil(1)) {
+				c++;
+				if (next.arg(2).eq_b(val)) {
+					return valueOf(c);
+				}
+				next = l.next(next.arg1());
+			}
+			return ZERO;
+		}
+	}
+	
+	static class count extends TableLibFunction {
+		public LuaValue call(LuaValue list) {
+			return argerror(2, "value expected, got no value");
+		}
+
+		public LuaValue call(LuaValue list, LuaValue val) {
+			LuaTable l = list.checktable();
+			Varargs next = l.next(LuaValue.NIL);
+			int c = 0;
+			while (!next.isnil(1)) {
+				if (next.arg(2).eq_b(val)) {
+					c++;
+				}
+				next = l.next(next.arg1());
+			}
+			return valueOf(c);
 		}
 	}
 
