@@ -2140,6 +2140,250 @@ a = {"a", "b", "c"}
 println(table.indexOf(a, "b"), " ", table.indexOf(a, "d"))
 ```
 
+#### Macro Function json.intersection()
+This functionality has been added to the table library. If the first tables is  a list, the values are used, otherwise the keys are used
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+c = {"a", "c", "e"}
+println(toJSON(table.intersection(a, c)))
+```
+
+#### Macro Function json.isEmpty()
+This functionality has been added to the table library as empty().
+
+```lua
+--{assert(0, "LUA")}--
+println("String ", table.empty("")) --true
+println("String a ", table.empty("a")) --false
+println("List ", table.empty({1})) --false
+println("Table ", table.empty({a=1})) --false
+println("Empty Table ", table.empty({})) --true
+```
+
+#### Macro Function json.isEmpty()
+This functionality has been added to the table library as empty().
+
+```lua
+--{assert(0, "LUA")}--
+println("String ", table.empty("")) --true
+println("String a ", table.empty("a")) --false
+println("List ", table.empty({1})) --false
+println("Table ", table.empty({a=1})) --false
+println("Empty Table ", table.empty({})) --true
+```
+
+#### Macro Function json.intersection()
+This functionality has been added to the table library as subset. If the first tables is  a list, the values are used, otherwise the keys are used
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+println(table.subset(a, {"a"}))
+println(table.subset(a, {"a", "b"}, {"a", "c"}))
+println(table.subset(a, {"a", "b"}, {"a", "c"}, {"d"}))
+b = {a=2, b=2, c=2}
+println(table.subset(b, {a=1}))
+println(table.subset(b, {a=1, b=1}, {a=1, c=33}))
+println(table.subset(b, {a=1, b=1}, {a=1, d=1}))
+```
+#### Macro Function json.length()
+This functionality has been added to the table library. However, the # operator in lua works similar
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+println(table.length(a))
+println(table.length({a=2, b=2, c=2}))
+println(table.length({}))
+println(table.length({1, 2, 3, 4, 5, 6, 7, 8, 9, 10}))
+println(#a) -- also 3
+```
+
+#### Macro Function json.merge()
+This functionality has been added to the table library. If the first tables is  a list, the values are used, otherwise the keys are used
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+c = {"a", "c", "e"}
+println(toJSON(table.merge(a, c)))
+println(toJSON(table.merge(c, a)))
+```
+
+#### Macro Function json.remove()
+Lua already has this functionality, table.remove removes entries from a list and setting a value in a table to nil removes it from there
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+table.remove(a, 2) -- removes b
+b = {a=1, c=1, e=1}
+b.c = nil
+println(toJSON(a))
+println(toJSON(b))
+```
+
+#### Macro Function json.removeAll()
+I might be stupid here, but I don't see the difference to json.difference(). It does modify the List, however writing a = json.difference(a, ...) might actually be faster.
+It also returns the elements it actually removed.
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+println(toJSON(table.removeAll(a, {"b", "c", "d"}))) -- "b, c"
+println(toJSON(a)) -- "a" is left
+```
+
+#### Macro Function json.reverse()
+This one is not included, but can be quickly made in LUA;
+
+```lua
+--{assert(0, "LUA")}--
+function table.reverse(tbl)
+  for i=1, math.floor(#tbl / 2) do
+    tbl[i], tbl[#tbl - i + 1] = tbl[#tbl - i + 1], tbl[i]
+  end
+end
+```
+And then it can be used like this
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+table.reverse(a)
+println(toJSON(a))
+```
+
+#### Macro Function json.set()
+This is done with the brackets or dot operators in lua, the datastructure must be converted to lua objects using fromJSON(). Careful, lua arrays count from 1
+
+```lua
+--{assert(0, "LUA")}--
+val = fromJSON("{a:1,b:44,c:12}")
+val.a = 2;
+val.aa = {}
+val.aa.aaa = "aaaa"
+val["b"] = 444;
+key = "c";
+val[key] = 1122 --indirect access
+println(toJSON(val))
+
+val2 = fromJSON("[\"aa\",\"bb\",\"cc\"]")
+val2[2] = "b2b" -- array access
+index = 3
+val2[index] = "cdc" --indirect access
+println(toJSON(val2))
+```
+
+
+#### Macro Function json.shuffle()
+This is part of the table library.
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+table.shuffle(a)
+println(toJSON(a))
+table.shuffle(a)
+println(toJSON(a))
+table.shuffle(a)
+println(toJSON(a))
+```
+
+#### Macro Function json.sort()
+Lua has a sort function, that is quite more powerful.
+
+```lua
+--{assert(0, "LUA")}--
+a = {"c", "a", "b", "d"}
+table.sort(a)
+println(toJSON(a))
+
+a = {"c", "a", "b", "d"}
+table.sort(a, function (a, b) return b < a end) -- reverse sort
+println(toJSON(a))
+```
+It is also possible to sort by keys like json.sort does. This custom function achieves this:
+
+```lua
+--{assert(0, "LUA")}--
+
+function sortkeys(keys, descending)
+  return function(a, b)
+    if (type(a)=="table" and type(b)=="table") then
+      for i, j in ipairs(keys) do
+        local aa = a[j]
+        local bb = b[j]
+        if aa ~= bb then
+          if descending then return bb < aa end
+          return aa < bb 
+        end
+      end
+    elseif type(a) == "table" then return true
+    end
+    return false
+  end
+end
+
+a = {{name="Hero", HP=10}, {name="Wolf", HP=5}, {name="Mage", HP=20}, {name="Troll", HP=15}, {name="Eagle", HP=5}}
+table.sort(a, sortkeys({"HP", "name"}))
+println(toJSON(a))
+```
+For more info, check out (the Lua Manual)[https://www.lua.org/pil/19.3.html]
+
+#### Macro Function json.toList()
+This functionality can be achieved using the toStr() and fromJSON() converters
+
+```lua
+--{assert(0, "LUA")}--
+a = {"c", "a", "b", "d"}
+println(toStr(a))
+println(toStr(fromJSON("[1,2,3]"), ";"))
+```
+
+#### Macro Function json.toStrProp()
+This functionality can be achieved using the toStr() and fromJSON() converters
+
+```lua
+--{assert(0, "LUA")}--
+a = {a=1, b=2, c=3}
+println(toStr(a))
+println(toStr(fromJSON("{a:11, b:22,c: 33}"), nil, ","))
+```
+
+#### Macro Function json.type()
+This functionality has been added to the table library. You can also use the Lua built-in type function to determine the type of most variables.
+
+```lua
+--{assert(0, "LUA")}--
+a = {"c", "a", "b", "d"}
+println(table.type(a))
+println(table.type({a=1, b=2}))
+println(type({a=1, b=2}))
+println(type("a"))
+println(type(1))
+println(type(nil))
+```
+#### Macro Function json.union()
+This functionality has been added to the table library. If the first tables is  a list, the values are used, otherwise the keys are used
+Order is not retained, use table.unique(table.merge(...)) instead, if that is needed.
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c"}
+c = {"a", "c", "e"}
+println(toJSON(table.union(a, c)))
+```
+
+#### Macro Function json.unique()
+This functionality has been added to the table library. If the first tables is  a list, the values are used, otherwise the keys are used
+Order is retained.
+
+```lua
+--{assert(0, "LUA")}--
+a = {"a", "b", "c", "a", "c", "d", "c", "e"}
+println(toJSON(table.unique(a)))
+```
+
 
 ### Roll-Options
 

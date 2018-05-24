@@ -37,12 +37,17 @@ public class FunctionalTableLib extends TableLib {
 		table.set("keys", new keys());
 		table.set("values", new values());
 		table.set("union", new union());
+		table.set("unique", new unique());
+		table.set("type", new type());
 		table.set("difference", new difference());
 		table.set("intersection", new intersection());
+		table.set("removeAll", new removeAll());
+		table.set("subset", new subset());
 		table.set("merge", new merge());
 		table.set("ordered", new ordered());
 		table.set("shuffle", new shuffle());
 		table.set("equals", new equals());
+		table.set("empty", new empty());
 		return result;
 	}
 
@@ -115,6 +120,19 @@ public class FunctionalTableLib extends TableLib {
 				result = func.call(result, val);
 			}
 			return result;
+		}
+	}
+	
+	static class empty extends TableLibFunction {
+		public LuaValue call(LuaValue list) {
+			if (list.isstring()) return valueOf(list.tojstring().isEmpty());
+			if (list.istable()) {
+				LuaTable l = list.checktable();
+				Varargs next = l.next(LuaValue.NIL);
+				return valueOf(next.isnil(1));
+				
+			}
+			return FALSE;
 		}
 	}
 
@@ -341,6 +359,24 @@ public class FunctionalTableLib extends TableLib {
 			}
 		}
 	}
+	
+	static class type extends VarArgFunction {
+		@Override
+		public Varargs invoke(Varargs args) {
+			if (args.arg1().istable()) {
+				LuaTable t = args.arg1().checktable();
+				boolean map = false;
+				for (Varargs n = t.next(NIL); !n.arg1().isnil(); n = t.next(n.arg1())) {
+					if (!n.arg1().isint()) {
+						map = true;
+						break;
+					}
+				}
+				return valueOf(map ? "OBJECT" : "ARRAY");
+			}
+			return valueOf("UNKNOWN");
+		}
+	}
 
 	static class difference extends VarArgFunction {
 		@Override
@@ -382,6 +418,107 @@ public class FunctionalTableLib extends TableLib {
 					r.insert(0, v);
 				}
 				return r;
+			}
+		}
+	}
+	
+	static class unique extends VarArgFunction {
+		@Override
+		public Varargs invoke(Varargs args) {
+			LuaTable t = args.arg1().checktable();
+			LuaTable r = new LuaTable();
+			Set<LuaValue> seen = new HashSet<LuaValue>();
+			for (Varargs n = t.inext(ZERO); !n.arg1().isnil(); n = t.inext(n.arg1())) {
+				if (!seen.contains(n.arg(2))) {
+					r.insert(0, n.arg(2));
+					seen.add(n.arg(2));
+				}
+			}
+			return r;
+		}
+	}
+	
+	static class removeAll extends VarArgFunction {
+		@Override
+		public Varargs invoke(Varargs args) {
+
+			LuaTable tt = args.arg1().checktable();
+			boolean map = false;
+			for (Varargs n = tt.next(NIL); !n.arg1().isnil(); n = tt.next(n.arg1())) {
+				if (!n.arg1().isint()) {
+					map = true;
+					break;
+				}
+			}
+			if (map) {
+				LuaTable r = new LuaTable();
+				for (int i = 2, nb = args.narg(); i <= nb; i++) {
+					LuaTable t = args.arg(i).checktable();
+					for (Varargs n = t.next(NIL); !n.arg1().isnil(); n = t.next(n.arg1())) {
+						LuaValue old = tt.get(n.arg1());
+						if (!old.isnil()) {
+							r.rawset(n.arg1(), old);
+						}
+						tt.rawset(n.arg1(), NIL);
+					}
+				}
+				return r;
+			} else {
+				LuaTable r = new LuaTable();
+				for (int i = 2, nb = args.narg(); i <= nb; i++) {
+					LuaTable t = args.arg(i).checktable();
+					for (Varargs n = t.inext(ZERO); !n.arg1().isnil(); n = t.inext(n.arg1())) {
+						for (Varargs nn = tt.inext(ZERO); !nn.arg1().isnil(); nn = tt.inext(nn.arg1())) {
+							if (nn.arg(2).eq_b(n.arg(2))) {
+								r.insert(0, nn.arg(2));
+								tt.remove(nn.arg1().checkint());
+								nn = nn.arg1().checkinteger().sub(1);
+								break;
+							}
+						}
+					}
+				}
+				return r;
+			}
+		}
+	}
+	
+	static class subset extends VarArgFunction {
+		@Override
+		public Varargs invoke(Varargs args) {
+
+			LuaTable t = args.arg1().checktable();
+			boolean map = false;
+			for (Varargs n = t.next(NIL); !n.arg1().isnil(); n = t.next(n.arg1())) {
+				if (!n.arg1().isint()) {
+					map = true;
+					break;
+				}
+			}
+			if (map) {
+				HashSet<LuaValue> vals = new HashSet<LuaValue>();
+				for (Varargs n = t.next(NIL); !n.arg1().isnil(); n = t.next(n.arg1())) {
+					vals.add(n.arg1());
+				}
+				for (int i = 2, nb = args.narg(); i <= nb; i++) {
+					t = args.arg(i).checktable();
+					for (Varargs n = t.next(NIL); !n.arg1().isnil(); n = t.next(n.arg1())) {
+						if (!vals.contains(n.arg1())) return FALSE;
+					}
+				}
+				return TRUE;
+			} else {
+				Set<LuaValue> vals = new HashSet<LuaValue>();
+				for (Varargs n = t.inext(ZERO); !n.arg1().isnil(); n = t.inext(n.arg1())) {
+					vals.add(n.arg(2));
+				}
+				for (int i = 2, nb = args.narg(); i <= nb; i++) {
+					t = args.arg(i).checktable();
+					for (Varargs n = t.inext(ZERO); !n.arg1().isnil(); n = t.inext(n.arg1())) {
+						if (!vals.contains(n.arg(2))) return FALSE;
+					}
+				}
+				return TRUE;
 			}
 		}
 	}
