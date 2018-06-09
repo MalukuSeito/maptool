@@ -1829,9 +1829,21 @@ println("A is not larger than B")
 end
 
 println(a>b and "A is larger than B" or "A is not larger than B") -- ternary, will not work if the part in "A is larger than B" is false/nil
+```
 
-#### Macro Function indexValueStrProp()
-Lua has no dedicated String Property and String List function, they have to be converted with [fromStr](#fromstr) to an acutal Lua-Table. During conversion, the order is preserved, so a indexValueStrProp function can be created like this
+#### Macro Function indexOf()
+This function is part of the string library. Careful, in Lua numbering starts at 1, so it will return 0 if nothing is found.
+
+```lua
+--{assert(0, "LUA")}--
+println(string.indexOf("this is a test", "is")) --finds the 'is' in 'this'
+local str = "this is a test";
+println(str:indexOf("a")) -- Lua object style invocation (same as string.indexOf(str, "a"))
+if str:indexOf("this") > 0 then println("Found") end -- starting at 1 means this will only be true of this is found
+```
+
+#### Macro Function indexKeyStrProp() and indexValueStrProp()
+Lua has no dedicated String Property and String List function, they have to be converted with [fromStr](#fromstr) to an acutal Lua-Table. During conversion, the order is preserved, so a indexValueStrProp function can be created like this:
 
 ```lua
 --{assert(0, "LUA")}--
@@ -1840,7 +1852,7 @@ if type(prop) ~= "table" then
 	prop = fromStr(prop)
 end
 for key, value in pairs(prop) do
-	if index == 0 then
+	if index == 1 then -- or index == 0 if you want to keep maptool numbering (starting at 0)
 	return value
 	end
 	index = index-1
@@ -1848,9 +1860,45 @@ end
 return nil
 end
 
-println(indexValueStrProp("a=blah; b=doh; c=meh", 1));
-println(indexValueStrProp(fromStr("a=blah; b=doh; c=meh"), 2));
-println(indexValueStrProp(fromStr("a=blah, b=doh, c=meh", nil, ","), 0)); --Change seperator to "," and force the input to be treated as a props list
+function indexKeyStrProp(prop, index)
+if type(prop) ~= "table" then
+	prop = fromStr(prop)
+end
+for key, value in pairs(prop) do
+	if index == 1 then
+	return key
+	end
+	index = index-1
+end
+return nil
+end
+
+println(indexValueStrProp("a=blah; b=doh; c=meh", 2));
+println(indexValueStrProp(fromStr("a=blah; b=doh; c=meh"), 3));
+println(indexKeyStrProp(fromStr("a=blah; b=doh; c=meh"), 3));
+println(indexValueStrProp(fromStr("a=blah, b=doh, c=meh", nil, ","), 1)); --Change seperator to "," and force the input to be treated as a props list
+```
+Since Lua allows more than one return value, one could also make a function like this
+
+```lua
+--{assert(0, "LUA")}--
+function indexStrProp(prop, index)
+if type(prop) ~= "table" then
+	prop = fromStr(prop)
+end
+for key, value in pairs(prop) do
+	if index == 1 then  -- or index == 0 if you want to keep maptool numbering (starting at 1)
+	return key, value -- Return both
+	end
+	index = index-1
+end
+return nil
+end
+
+local k, v = indexStrProp(fromStr("a=blah; b=doh; c=meh"), 2)
+println("Key: ", k)
+println("Value: ", v)
+
 ```
 
 #### Macro Function initiativeSize()
@@ -2363,6 +2411,7 @@ println(type("a"))
 println(type(1))
 println(type(nil))
 ```
+
 #### Macro Function json.union()
 This functionality has been added to the table library. If the first tables is  a list, the values are used, otherwise the keys are used
 Order is not retained, use table.unique(table.merge(...)) instead, if that is needed.
@@ -2383,6 +2432,271 @@ Order is retained.
 a = {"a", "b", "c", "a", "c", "d", "c", "e"}
 println(toJSON(table.unique(a)))
 ```
+
+#### Macro Function keep()
+This function is part of the dice library.
+```lua
+--{assert(0, "LUA")}--
+println(dice.keep(5, 10, 2))
+```
+
+#### Macro Function lastIndexOf()
+This function is part of the string library. Careful, in Lua numbering starts at 1, so it will return 0 if nothing is found.
+
+```lua
+--{assert(0, "LUA")}--
+println(string.lastIndexOf("this is a test", "is")) --finds the 'is' in 'is'
+local str = "this is a test";
+println(str:lastIndexOf("t")) -- Lua object style invocation (same as string.lastIndexOf(str, "t"))
+if str:lastIndexOf("test") > 0 then println("Found") end -- starting at 1 means this will only be true of this is found
+```
+
+#### Macro Function lastIndexOf()
+This function is called string.len() in LUA
+
+```lua
+--{assert(0, "LUA")}--
+println(string.len("this is a test"))
+local str = "this is a test";
+println(str:len()) -- Lua object style invocation, same as above 
+```
+
+#### Macro Functions listAppend() and listInsert()
+There is not specific function for this, since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+Then LUA's table.insert() can be used to add values anywhere in the list
+
+```lua
+--{assert(0, "LUA")}--
+local list = fromStr("This, is, a", ",") -- force list by giving a list seperator
+table.insert(list, "test")
+-- Maybe do something else with the table named 'list'
+println(toStr(list, ", "))
+table.insert(list, 1, "Wait") -- Insert at front
+println(toStr(list, ", "))
+-- Or:
+println(toStr(table.merge(fromStr("This, is, a", ","), {"test"}) ,", ")) -- in one line with table.merge()
+```
+
+#### Macro Function listContains()
+There is not specific function for this, since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+Then table.contains() can be used:
+
+```lua
+--{assert(0, "LUA")}--
+local strlist = "a,b,c,a,b,a"
+if table.contains(fromStr(strlist), "a") then 
+  println("In there") 
+else 
+  println("Not found, buddy") 
+end
+```
+
+However table.contains only returns a boolean value (true/false), to count, table.count() must be used:
+
+```lua
+--{assert(0, "LUA")}--
+println(table.count(fromStr("a,b,c,a,b,a"), "a"))
+```
+
+#### Macro Function listCount()
+There is not specific function for this, since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+Then table.length() can be used:
+
+```lua
+--{assert(0, "LUA")}--
+println(table.length(fromStr("a,b,c,a,b,a")))
+```
+
+#### Macro Function listDelete()
+There is not specific function for this, since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+Then LUA's table.remove() can be used. However, LUA starts counting at 1 not 0.
+
+```lua
+--{assert(0, "LUA")}--
+local list = fromStr("This, is, a, test", ",") -- force list by giving a list seperator
+table.remove(list, 2) -- 2nd word is "is"
+-- Maybe do something else with the table named 'list'
+println(toStr(list, ", "))
+```
+
+#### Macro Function listFind()
+There is not specific function for this, since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+Then table.indexOf() can be used, but since LUA starts counting at 1, not 0, the returned value will differ by 1 to maptool macros.
+This also means, that 0 is returned if the element is not found.
+
+```lua
+--{assert(0, "LUA")}--
+println(table.indexOf(fromStr("a,b,c,a,b,a"), "c"))
+```
+
+#### Macro Function listFormat()
+There is not specific function for this, and since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+Then a custom formatting function can be developed:
+
+```lua
+--{assert(0, "LUA")}--
+function listFormat(list, lFormat, iFormat, seperator, delim)
+if type(list) ~= "table" then
+	list = fromStr(list, delim)
+end
+local result = ""
+for k, value in ipairs(list) do
+	if k > 1 then result = result..seperator end
+	result = result..iFormat:replace("%item", value)
+end
+return lFormat:replace("%list",result)
+end
+
+println(listFormat("apple,bear,cat", "BEGIN LIST<br>%list<br>END LIST", "This item is: %item", "<br>"))
+```
+Or in one line using table.map(t, function) and toStr to join with a seperator.
+```lua
+--{assert(0, "LUA")}--
+local lFormat="BEGIN LIST<br>%list<br>END LIST"
+local iFormat="This item is: %item"
+local seperator="<br>"
+println(lFormat:replace("%list", toStr(table.map(fromStr("apple,bear,cat"), function (x) return iFormat:replace("%item",x) end), seperator)))
+```
+
+#### Macro Function listGet()
+There is not specific function for this, since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+After conversion, values in a list can be accessed with the [] operator, however in LUA list the index starts at 1.
+
+```lua
+--{assert(0, "LUA")}--
+local list = fromStr("a,b,c,a,b,a", ",");
+println(list[2]) -- second element: b
+
+println(fromStr("a,b,c,a,b,a", ",")[3]) -- same in one line, prints 'c'
+```
+
+#### Macro Function listGet()
+There is not specific function for this, since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+After conversion, values in a list can be changed with the [] operator, however in LUA list the index starts at 1.
+
+```lua
+--{assert(0, "LUA")}--
+local list = fromStr("a,b,c,a,b,a", ",");
+list[2] = "other"
+println(toStr(list, ", "))
+```
+
+#### Macro Function listSort()
+There is not specific function for this, since Lua has its own data structures, string lists need be converted with [fromStr](#fromstr).
+
+However, Lua has a sort function, that is quite more powerful.
+
+```lua
+--{assert(0, "LUA")}--
+local a = {"c", "a", "b", "d"}
+table.sort(a)
+println(toStr(a))
+
+local a = fromStr("a,b,c,a,b,a", ",");
+table.sort(a, function (a, b) return b < a end) -- reverse sort
+println(toStr(a))
+```
+To sort similar to listSort with an N parameter
+
+```lua
+--{assert(0, "LUA")}--
+
+function sortNumeric(descending)
+  return function(a, b)
+    local aa = string.split(""..a, "(?<!\\d)(?=\\d)|(?<=\\d)(?!\\d)") --Split where digits end and non-digits start or non-digits end and digits start 
+    local bb = string.split(""..b, "(?<!\\d)(?=\\d)|(?<=\\d)(?!\\d)") -- 
+    local min = math.min(#aa, #bb) -- find the shorter one of both
+    for i = 1,min do -- go through all elements of the split
+      local aaa = nil;
+      local bbb = nil;
+      if tonumber(aa[i])~=nil and tonumber(bb[i])~=nil then -- if both are numbers
+        aaa = tonumber(aa[i]) -- compare numbers
+        bbb = tonumber(bb[i])
+      else
+        aaa = aa[i] --compare alphabetical
+        bbb = bb[i]
+      end
+      if aaa ~= bbb then if descending then return aaa > bbb else return aaa < bbb end end -- if they differ, return the smaller one, next pack otherwise
+    end
+    if descending then return #aa > #bb else return #aa < #bb end --if everything else is the same the shorter one counts as smaller
+  end
+end
+
+local a = fromStr("Monster11,Monster3,Monster12,Monster66,Monster87,Monster71,Human10,Human6,Human,Monster12Special2,Monster12Special,Monster12Special1")
+table.sort(a, sortNumeric())
+println(toStr(a, ", "))
+table.sort(a, sortNumeric(true)) --descending
+println(toStr(a, ", "))
+```
+For more info, check out (the Lua Manual)[https://www.lua.org/pil/19.3.html]
+
+#### Macro Function ln()
+This is part of LUA's math library as math.log.
+```
+--{assert(0, "LUA")}--
+println(math.log(5))
+```
+
+#### Macro Functions log() and log10()
+This has been added as math.log10().
+```
+--{assert(0, "LUA")}--
+println(math.log10(5))
+```
+
+#### Macro Function lower()
+This is part of the Lua string libraray.
+```
+--{assert(0, "LUA")}--
+println(string.lower("This is a Test"))
+```
+
+If only a part of the string needs to be converted, string.sub() has to be used:
+```
+--{assert(0, "LUA")}--
+local str = "THIS is a Test"
+local maxnum = 1
+str = str:sub(1, maxnum):lower()..str:sub(maxnum+1)
+println(str)
+```
+
+#### Macro Functions macroLink() and macroLinkText
+This functionality has been added as macro.link() and macro.linkText()
+
+```
+--{assert(0, "LUA")}--
+println(macro.link("Click on me!", "Test@Lib:Test", "gm", "count=6", "impersonated"))
+println(macro.linkText("Test@Lib:Test", "gm", "count=6", "impersonated"))
+```
+The args parameter is automatically converted to JSON:
+```
+--{assert(0, "LUA")}--
+local args = {count=6, values={1, 3, 4, 5, 7, 8}}
+println(macro.linkText("Test@Lib:Test", "gm", args, "impersonated"))
+```
+Careful, putting in LUA objects, like tokens, will result in them being converted to strings and loose their specialness. 
+Tokens-Objects turn into GUIDs for Tokens and can be revived using tokens.resolve(id).
+
+
+#### Macro Function matches()
+This functionality has been added to the string library.
+
+```LUA
+--{assert(0, "LUA")}--
+println(string.matches("This is a test", "test"))
+println(string.matches("test", "test"))
+local str = "This is a test"
+println(str:matches(".*test"))
+```
+
 
 
 ### Roll-Options

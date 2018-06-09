@@ -61,7 +61,7 @@ public class ExtendedStringLib extends StringLib {
 	static class SubString extends ThreeArgFunction {
 		public LuaValue call(LuaValue string, LuaValue start, LuaValue end) {
 			if (!end.isnil()) {
-				return LuaValue.valueOf(string.checkjstring().substring(start.checkint(), end.checkint()));
+				return LuaValue.valueOf(string.checkjstring().substring(start.checkint() - 1, end.checkint() - 1));
 			}
 			return LuaValue.valueOf(string.checkjstring().substring(start.checkint()));
 		}
@@ -144,7 +144,7 @@ public class ExtendedStringLib extends StringLib {
 			if (start.isnumber()) {
 				return LuaValue.valueOf(string.checkjstring().indexOf(find.checkjstring(), start.toint()));
 			}
-			return LuaValue.valueOf(string.checkjstring().indexOf(find.checkjstring()));
+			return LuaValue.valueOf(string.checkjstring().indexOf(find.checkjstring()) + 1);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class ExtendedStringLib extends StringLib {
 			if (start.isnumber()) {
 				return LuaValue.valueOf(string.checkjstring().lastIndexOf(find.checkjstring(), start.toint()));
 			}
-			return LuaValue.valueOf(string.checkjstring().lastIndexOf(find.checkjstring()));
+			return LuaValue.valueOf(string.checkjstring().lastIndexOf(find.checkjstring()) + 1);
 		}
 	}
 

@@ -16,6 +16,7 @@ public class MathLib extends JseMathLib {
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaValue math = super.call(modname, env);
 		math.set("hypot", new hypot());
+		math.set("log10", new log10());
 		return math;
 	}
 
@@ -23,5 +24,11 @@ public class MathLib extends JseMathLib {
 		protected double call(double d, double o) {
 			return Math.hypot(d, o);
 		}
+	}
+	
+	static final class log10 extends UnaryOp { 
+		protected double call(double d) { 
+			return Math.log10(d); 
+		} 
 	}
 }
